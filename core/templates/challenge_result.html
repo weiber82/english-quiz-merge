@@ -1,0 +1,11 @@
+{% load static %}
+
+{% block content %}
+<h2>挑戰結果</h2>
+
+<p>總題數：{{ total }}</p>
+<p>答對題數：{{ correct }}</p>
+<p>得分：{{ score }} 分</p>
+
+<a href="{% url 'dashboard' %}">回到主頁</a>
+{% endblock %}

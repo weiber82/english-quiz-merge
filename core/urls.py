@@ -23,4 +23,6 @@ urlpatterns = [
     path('wrong-questions/', views.wrong_questions_view, name='my_wrong_questions'),
     path('diagnose-weakness/', views.diagnose_weakness_view, name='diagnose_weakness'),
     path('grade-history/', views.grade_history_view, name='grade_history'),
+    path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
+    path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
 ]
