@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models import Min
+from django.utils import timezone
+import random
 
 class User(models.Model):
     ROLE_CHOICES = (
@@ -13,7 +16,6 @@ class User(models.Model):
     def __str__(self):
         return f"{self.username} ({self.role})"
 
-
     @classmethod
     def find_by_username(cls, username):
         try:
@@ -25,19 +27,32 @@ class User(models.Model):
     def create(cls, username, password):
         return cls.objects.create(username=username, password=password)
 
+    @classmethod
+    def get_by_id(cls, user_id):
+        try:
+            return cls.objects.get(id=user_id)
+        except cls.DoesNotExist:
+            return None
+
 
 class Question(models.Model):
     content = models.TextField()
-    options = models.JSONField()  # 用 dict 儲存 ABCD
-    answer = models.CharField(max_length=1)  # 正解 A/B/C/D
-    topic = models.CharField(max_length=50)  # vocab/grammar/cloze/reading
+    options = models.JSONField()
+    answer = models.CharField(max_length=1)
+    topic = models.CharField(max_length=50)
     is_gpt_generated = models.BooleanField(default=False)
     created_dt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.content[:30]
-    
 
+    @staticmethod
+    def get_by_topic(topic, include_gpt):
+        qs = Question.objects.filter(topic=topic)
+        if include_gpt == 'no':
+            qs = qs.filter(is_gpt_generated=False)
+        return list(qs)      
+    
 
 class TestRecord(models.Model):
     test_result_id = models.CharField(max_length=64) 
@@ -76,6 +91,64 @@ class TestRecord(models.Model):
         return (correct / total * 100) if total else 0
     
 
+    # 新增封裝方法：取得這次測驗的所有紀錄
+    @classmethod
+    def get_test_records(cls, user_id, test_result_id):
+        return cls.objects.filter(user_id=user_id, test_result_id=test_result_id)
+
+    # 新增封裝方法：取得正確筆數
+    @classmethod
+    def get_correct_count(cls, user_id, test_result_id):
+        return cls.get_test_records(user_id, test_result_id).filter(is_correct=True).count()
+
+    # 新增封裝方法：取得錯題紀錄
+    @classmethod
+    def get_wrong_records(cls, user_id, test_result_id):
+        return cls.get_test_records(user_id, test_result_id).filter(is_correct=False)
+    
+
+    @classmethod
+    def get_recent_test_session_summaries(cls, user, limit=10):
+        """
+        獲取指定使用者最近的測驗摘要列表。
+        每筆摘要包含：測驗日期、主題、總題數、答對題數、正確率、測驗結果ID。
+        """
+        test_sessions_query = cls.objects.filter(user=user) \
+                                         .values('test_result_id') \
+                                         .annotate(test_date=Min('timestamp')) \
+                                         .order_by('-test_date')[:limit]
+
+        test_history_details = []
+        for session_data in test_sessions_query:
+            session_id = session_data['test_result_id']
+            session_date = session_data['test_date']
+
+            records_for_session = cls.objects.filter(user=user, test_result_id=session_id)
+
+            total_questions = records_for_session.count()
+            if total_questions == 0:
+                continue
+
+            correct_questions = records_for_session.filter(is_correct=True).count()
+            accuracy = round((correct_questions / total_questions) * 100, 2)
+
+            first_record = records_for_session.select_related('question').first()
+            test_topic = "未知主題"
+            if first_record and first_record.question:
+                test_topic = first_record.question.topic
+
+            test_history_details.append({
+                'test_date': session_date,
+                'test_topic': test_topic,
+                'total_questions': total_questions,
+                'correct_questions': correct_questions,
+                'accuracy': accuracy,
+                'test_result_id': session_id,
+            })
+
+        return test_history_details
+    
+
 class WeakTopic(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     topic = models.CharField(max_length=50)  # 與 Question.topic 對應
@@ -83,6 +156,19 @@ class WeakTopic(models.Model):
 
     def __str__(self):
         return f"{self.user.username} 的弱項：{self.topic}"
+
+    @classmethod
+    def update_or_create_weak_topic(cls, user, topic_name):
+        weak_topic, created = cls.objects.update_or_create(
+            user=user,
+            topic=topic_name,
+            defaults={'last_diagnosed': timezone.now()}
+        )
+        return weak_topic, created
+
+    @classmethod
+    def get_weak_topics_for_user(cls, user):
+        return cls.objects.filter(user=user).order_by('-last_diagnosed')
 
 
 class Explanation(models.Model):
@@ -156,3 +242,59 @@ class Favorite(models.Model):
             favorite.save()
         except cls.DoesNotExist:
             pass
+
+
+class WrongQuestion(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    question = models.ForeignKey(Question, on_delete=models.CASCADE) 
+    confirmed = models.BooleanField(default=False)
+    last_wrong_time = models.DateTimeField(auto_now=True)
+    note = models.TextField(blank=True, null=True)
+
+    is_fixed = models.BooleanField(default=False)
+    created_dt = models.DateTimeField(auto_now_add=True)
+    fixed_dt = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('user', 'question')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.question.content[:50]}..."
+
+    # 原本的 get_or_create
+    @classmethod
+    def get_or_create(cls, user, question, defaults=None):
+        return cls.objects.get_or_create(user=user, question=question, defaults=defaults)
+
+    # 原本的 save_wrong_question
+    def save_wrong_question(self):
+        self.save()
+
+    # 原本的 update_wrong_question_fields
+    def update_wrong_question_fields(self, fields_to_update=None):
+        self.save(update_fields=fields_to_update)
+
+    # 原本的 get_unconfirmed_by_user_and_topic
+    @classmethod
+    def get_unconfirmed_by_user_and_topic(cls, user, topic=None):
+        query = cls.objects.filter(user=user, confirmed=False)
+        if topic and topic != 'all':
+            query = query.filter(question__topic=topic)
+        return query.order_by('-last_wrong_time')
+
+    # 原本的 get_distinct_topics_for_unconfirmed_by_user
+    @classmethod
+    def get_distinct_topics_for_unconfirmed_by_user(cls, user):
+        return cls.objects.filter(user=user, confirmed=False) \
+                          .values_list('question__topic', flat=True) \
+                          .distinct() \
+                          .order_by('question__topic')
+
+    # 原本的 get_sample_for_weakness_analysis
+    @classmethod
+    def get_sample_for_weakness_analysis(cls, user, sample_count):
+        all_user_wrong_questions = cls.objects.filter(user=user, confirmed=False)
+        actual_sample_count = min(len(all_user_wrong_questions), sample_count)
+        if actual_sample_count > 0:
+            return random.sample(list(all_user_wrong_questions), actual_sample_count)
+        return []

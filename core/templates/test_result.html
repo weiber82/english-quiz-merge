@@ -21,10 +21,11 @@
       {% for item in wrong_records %}
         {% with record=item.record %}
           <li class="list-group-item">
-            <p><strong>Q{{ item.seq }}.</strong> {{ record.question.content }}</p>
+            <!-- 題目與詳解按鈕 -->
+            <p class="mb-1"><strong>Q{{ item.seq }}.</strong> {{ record.question.content }}</p>
             <p>你選了: {{ record.selected_option }}. {{ record.question.options|get_item:record.selected_option }}</p>
             <p>正確答案: {{ record.question.answer }}. {{ record.question.options|get_item:record.question.answer }}</p>
-            <a href="/gpt/?qid={{ record.question.id }}" class="btn btn-sm btn-outline-info">GPT 詳解</a>
+            <a href="/gpt/?qid={{ record.question.id }}" class="btn btn-sm btn-outline-info">查看 GPT 詳解與收藏</a>
           </li>
         {% endwith %}
       {% endfor %}

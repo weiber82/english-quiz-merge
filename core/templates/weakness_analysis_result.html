@@ -1,0 +1,55 @@
+{% comment %} core/templates/weakness_analysis_result.html {% endcomment %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 弱點診斷分析</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>AI 弱點診斷分析 (S6 功能)</h2>
+        <hr>
+
+        <form method="post" action="{% url 'diagnose_weakness' %}" class="mb-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">開始進行弱點分析</button>
+        </form>
+
+        {% if analysis_summary %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    本次 AI 診斷摘要
+                </div>
+                <div class="card-body">
+                    <p>{{ analysis_summary|linebreaksbr }}</p>
+                    {% if identified_weak_topics %}
+                        <h6>新識別出的弱點主題：</h6>
+                        <ul>
+                            {% for topic in identified_weak_topics %}
+                                <li>{{ topic }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if existing_weak_topics %}
+            <h4>您已記錄的弱點主題：</h4>
+            <ul class="list-group">
+                {% for wt in existing_weak_topics %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ wt.topic }}
+                        <small class="text-muted">上次診斷時間：{{ wt.last_diagnosed }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>目前沒有已記錄的弱點主題。</p>
+        {% endif %}
+        <hr>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">返回主頁</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,191 @@
+{% comment %} core/templates/grade_history.html {% endcomment %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> {# 加上 viewport 方便行動裝置瀏覽 #}
+    <title>{{ page_title|default:"測驗歷史記錄" }}</title> {# 提供一個預設標題 #}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {# 提前引入 Chart.js #}
+    <style>
+        body { padding-top: 20px; padding-bottom: 20px; } /* 簡單的頁面上下邊距 */
+        .container { max-width: 960px; }
+        .table th, .table td { vertical-align: middle; }
+        /* 可以為圖表容器加個樣式 */
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 50vh; /* 讓圖表高度適應視窗 */
+            width: 80vw;  /* 讓圖表寬度適應視窗 */
+            max-width: 700px; /* 最大寬度限制 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>{{ page_title|default:"測驗歷史記錄" }} (S7 功能)</h2>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a>
+        </div>
+        <hr>
+
+        {% if test_history %}
+            <p>您最近的 {{ test_history|length }} 次測驗記錄：</p>
+            <table class="table table-striped table-hover">
+                <thead class="thead-light"> {# 讓表頭 थोड़ा (shāowēi) 亮一點 #}
+                    <tr>
+                        <th>測驗日期</th>
+                        <th>測驗主題</th>
+                        <th>總題數</th>
+                        <th>答對題數</th>
+                        <th>正確率</th>
+                        <th>操作</th> {# 未來可以加「查看詳情」的連結 #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test_session in test_history %}
+                        <tr>
+                            <td>{{ test_session.test_date|date:"Y-m-d H:i" }}</td>
+                            <td>{{ test_session.test_topic }}</td>
+                            <td>{{ test_session.total_questions }}</td>
+                            <td>{{ test_session.correct_questions }}</td>
+                            <td>{{ test_session.accuracy }}%</td>
+                            <td>
+                                {# 可以考慮連結到該次測驗的 test_result_view (如果 test_result_view 能接收 test_result_id 重新顯示結果) #}
+                                {# 或者連結到一個新的 view 來顯示單次測驗的詳細答題情況 #}
+                                {# <a href="{% url 'core:test_result_by_id' test_session.test_result_id %}" class="btn btn-sm btn-info">查看詳情</a> #}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {# --- 整體正確率趨勢圖 --- #}
+            {% if test_history|length > 1 %} {# 至少要有兩筆記錄才能畫趨勢線 #}
+                <hr class="my-4">
+                <h4>整體正確率趨勢</h4>
+                <div class="chart-container"> {# 使用 class 來控制大小 #}
+                    <canvas id="accuracyTrendChart"></canvas>
+                </div>
+
+                {# --- 把 test_history 數據用 json_script 安全地嵌入到 HTML 中 --- #}
+                {{ test_history|json_script:"history-data-for-chart" }}
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const historyDataElement = document.getElementById('history-data-for-chart');
+                        if (!historyDataElement) {
+                            console.error("Element with ID 'history-data-for-chart' not found.");
+                            return;
+                        }
+                        
+                        const historyDataJSON = historyDataElement.textContent;
+                        const parsedHistoryData = JSON.parse(historyDataJSON);
+
+                        console.log("Parsed historyData for chart (in HTML):", parsedHistoryData);
+
+                        if (!parsedHistoryData || parsedHistoryData.length < 2) {
+                            console.log("Not enough history data to draw a trend chart (need at least 2 points).");
+                            var chartCanvas = document.getElementById('accuracyTrendChart');
+                            if(chartCanvas) {
+                                var ctx = chartCanvas.getContext('2d');
+                                ctx.font = "16px Arial";
+                                ctx.textAlign = "center";
+                                ctx.fillStyle = "#888"; // 提示文字顏色
+                                ctx.fillText("測驗記錄不足兩筆，無法繪製趨勢圖。", chartCanvas.width/2, chartCanvas.height/2 > 20 ? chartCanvas.height/2 : 20);
+                            }
+                            return; 
+                        }
+
+                        const reversedHistory = parsedHistoryData.slice().reverse(); 
+
+                        const labels = reversedHistory.map(item => {
+                            // item.test_date 現在應該是 ISO 格式的字串，例如 "2025-05-27T05:07:27.403Z"
+                            let d = new Date(item.test_date); 
+                            if (isNaN(d.getTime())) {
+                                console.error("Invalid date encountered in historyData:", item.test_date);
+                                return "無效日期"; 
+                            }
+                            return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+                        });
+
+                        const accuracies = reversedHistory.map(item => parseFloat(item.accuracy)); // 確保是數字
+
+                        const data = {
+                            labels: labels,
+                            datasets: [{
+                                label: '整體正確率 (%)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 2,
+                                data: accuracies,
+                                fill: true, 
+                                tension: 0.2 
+                            }]
+                        };
+
+                        const config = {
+                            type: 'line',
+                            data: data,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false, // 讓圖表填滿容器，由 .chart-container 控制大小
+                                scales: {
+                                    y: {
+                                        beginAtZero: true, 
+                                        suggestedMax: 100,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return value + "%"
+                                            }
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: '測驗時間'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return context.dataset.label + ': ' + context.parsed.y + '%';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        var myChart = new Chart(
+                            document.getElementById('accuracyTrendChart'),
+                            config
+                        );
+                    });
+                </script>
+            {% else %}
+                <p class="mt-3"><em>測驗記錄不足 (<2 筆)，無法繪製趨勢圖。</em></p>
+            {% endif %}
+            {# --- 圖表結束 --- #}
+
+        {% else %}
+            <div class="alert alert-info mt-3" role="alert">
+                目前沒有測驗記錄可供查詢。
+            </div>
+        {% endif %}
+        <br> 
+        {# 把返回主頁按鈕移到最下方，並加上 mb-3 (margin-bottom) #}
+        <div class="text-center mb-3"> 
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a> 
+        </div>
+    </div>
+
+    {# Bootstrap JS (通常放在 body 結尾) #}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,962 @@
+[
+  {
+    "content": "Choose the word closest in meaning to: 'That'",
+    "options": {
+      "A": "have",
+      "B": "cup",
+      "C": "per",
+      "D": "That"
+    },
+    "answer": "D",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Film'",
+    "options": {
+      "A": "to",
+      "B": "Film",
+      "C": "support",
+      "D": "now"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Live'",
+    "options": {
+      "A": "population",
+      "B": "Live",
+      "C": "son",
+      "D": "take"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Lose'",
+    "options": {
+      "A": "Lose",
+      "B": "discover",
+      "C": "send",
+      "D": "technology"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Later'",
+    "options": {
+      "A": "respond",
+      "B": "nice",
+      "C": "Later",
+      "D": "together"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Role'",
+    "options": {
+      "A": "easy",
+      "B": "recent",
+      "C": "Role",
+      "D": "message"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Happen'",
+    "options": {
+      "A": "Happen",
+      "B": "instead",
+      "C": "company",
+      "D": "decision"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Walk'",
+    "options": {
+      "A": "Walk",
+      "B": "bit",
+      "C": "help",
+      "D": "authority"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Side'",
+    "options": {
+      "A": "onto",
+      "B": "Side",
+      "C": "commercial",
+      "D": "fish"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Similar'",
+    "options": {
+      "A": "Similar",
+      "B": "walk",
+      "C": "instead",
+      "D": "goal"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'You'",
+    "options": {
+      "A": "You",
+      "B": "expert",
+      "C": "red",
+      "D": "shoulder"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Body'",
+    "options": {
+      "A": "Body",
+      "B": "nation",
+      "C": "break",
+      "D": "can"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Environmental'",
+    "options": {
+      "A": "candidate",
+      "B": "green",
+      "C": "Environmental",
+      "D": "discuss"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Myself'",
+    "options": {
+      "A": "before",
+      "B": "Myself",
+      "C": "say",
+      "D": "read"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Democrat'",
+    "options": {
+      "A": "its",
+      "B": "everybody",
+      "C": "the",
+      "D": "Democrat"
+    },
+    "answer": "D",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Certain'",
+    "options": {
+      "A": "least",
+      "B": "large",
+      "C": "Certain",
+      "D": "peace"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Work'",
+    "options": {
+      "A": "heavy",
+      "B": "morning",
+      "C": "director",
+      "D": "Work"
+    },
+    "answer": "D",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Painting'",
+    "options": {
+      "A": "discussion",
+      "B": "glass",
+      "C": "Painting",
+      "D": "what"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Affect'",
+    "options": {
+      "A": "production",
+      "B": "project",
+      "C": "Affect",
+      "D": "style"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Left'",
+    "options": {
+      "A": "property",
+      "B": "nearly",
+      "C": "Left",
+      "D": "on"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Environmental'",
+    "options": {
+      "A": "Environmental",
+      "B": "report",
+      "C": "financial",
+      "D": "from"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'True'",
+    "options": {
+      "A": "various",
+      "B": "True",
+      "C": "or",
+      "D": "want"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'While'",
+    "options": {
+      "A": "While",
+      "B": "nature",
+      "C": "economy",
+      "D": "security"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'West'",
+    "options": {
+      "A": "so",
+      "B": "tax",
+      "C": "road",
+      "D": "West"
+    },
+    "answer": "D",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Simple'",
+    "options": {
+      "A": "make",
+      "B": "pull",
+      "C": "manage",
+      "D": "Simple"
+    },
+    "answer": "D",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Fine'",
+    "options": {
+      "A": "north",
+      "B": "southern",
+      "C": "mean",
+      "D": "Fine"
+    },
+    "answer": "D",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Reveal'",
+    "options": {
+      "A": "finally",
+      "B": "Reveal",
+      "C": "community",
+      "D": "say"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Along'",
+    "options": {
+      "A": "up",
+      "B": "imagine",
+      "C": "open",
+      "D": "Along"
+    },
+    "answer": "D",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Us'",
+    "options": {
+      "A": "Us",
+      "B": "hair",
+      "C": "consumer",
+      "D": "war"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Pay'",
+    "options": {
+      "A": "Pay",
+      "B": "art",
+      "C": "cold",
+      "D": "their"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Seven'",
+    "options": {
+      "A": "task",
+      "B": "sing",
+      "C": "Seven",
+      "D": "common"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Hear'",
+    "options": {
+      "A": "before",
+      "B": "final",
+      "C": "agreement",
+      "D": "Hear"
+    },
+    "answer": "D",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Kitchen'",
+    "options": {
+      "A": "either",
+      "B": "Kitchen",
+      "C": "consumer",
+      "D": "authority"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Heavy'",
+    "options": {
+      "A": "bit",
+      "B": "Heavy",
+      "C": "daughter",
+      "D": "election"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Near'",
+    "options": {
+      "A": "establish",
+      "B": "Near",
+      "C": "seat",
+      "D": "bed"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Fill'",
+    "options": {
+      "A": "Fill",
+      "B": "along",
+      "C": "may",
+      "D": "scientist"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'One'",
+    "options": {
+      "A": "One",
+      "B": "stop",
+      "C": "policy",
+      "D": "paper"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Value'",
+    "options": {
+      "A": "Value",
+      "B": "officer",
+      "C": "activity",
+      "D": "discussion"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Spend'",
+    "options": {
+      "A": "drive",
+      "B": "present",
+      "C": "Spend",
+      "D": "whatever"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the correct form: 'Government'",
+    "options": {
+      "A": "unit",
+      "B": "Government",
+      "C": "chair",
+      "D": "almost"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Tax ___ space'",
+    "options": {
+      "A": "thing",
+      "B": "whole",
+      "C": "day",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Realize ___ thing'",
+    "options": {
+      "A": "yourself",
+      "B": "bill",
+      "C": "is",
+      "D": "bank"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Movie ___ establish'",
+    "options": {
+      "A": "doctor",
+      "B": "is",
+      "C": "dog",
+      "D": "type"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Meet ___ state'",
+    "options": {
+      "A": "cover",
+      "B": "is",
+      "C": "Mr",
+      "D": "individual"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Kid ___ event'",
+    "options": {
+      "A": "community",
+      "B": "our",
+      "C": "is",
+      "D": "tonight"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Even ___ town'",
+    "options": {
+      "A": "is",
+      "B": "eight",
+      "C": "last",
+      "D": "way"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Animal ___ try'",
+    "options": {
+      "A": "animal",
+      "B": "day",
+      "C": "leave",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Experience ___ risk'",
+    "options": {
+      "A": "is",
+      "B": "challenge",
+      "C": "drive",
+      "D": "evidence"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Arm ___ might'",
+    "options": {
+      "A": "exist",
+      "B": "and",
+      "C": "is",
+      "D": "personal"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Board ___ trouble'",
+    "options": {
+      "A": "owner",
+      "B": "is",
+      "C": "meeting",
+      "D": "radio"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Seem ___ significant'",
+    "options": {
+      "A": "treatment",
+      "B": "material",
+      "C": "mind",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Audience ___ keep'",
+    "options": {
+      "A": "rich",
+      "B": "home",
+      "C": "is",
+      "D": "suggest"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Camera ___ eye'",
+    "options": {
+      "A": "cold",
+      "B": "mission",
+      "C": "partner",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Between ___ occur'",
+    "options": {
+      "A": "is",
+      "B": "clearly",
+      "C": "project",
+      "D": "mean"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'With ___ skill'",
+    "options": {
+      "A": "organization",
+      "B": "coach",
+      "C": "leader",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Get ___ stop'",
+    "options": {
+      "A": "example",
+      "B": "mention",
+      "C": "enjoy",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Sing ___ ready'",
+    "options": {
+      "A": "is",
+      "B": "including",
+      "C": "big",
+      "D": "stop"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Officer ___ one'",
+    "options": {
+      "A": "radio",
+      "B": "get",
+      "C": "our",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Establish ___ fine'",
+    "options": {
+      "A": "product",
+      "B": "writer",
+      "C": "eat",
+      "D": "is"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Fill in the blank: 'Sing ___ rest'",
+    "options": {
+      "A": "is",
+      "B": "fast",
+      "C": "side",
+      "D": "force"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Human number person white democratic bring.'",
+    "options": {
+      "A": "Yes",
+      "B": "land",
+      "C": "no",
+      "D": "product"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Specific section easy million bar thought kid.'",
+    "options": {
+      "A": "Yes",
+      "B": "hotel",
+      "C": "red",
+      "D": "even"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Commercial soldier first show occur it rule hear system operation question history start.'",
+    "options": {
+      "A": "image",
+      "B": "rest",
+      "C": "Yes",
+      "D": "adult"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Star media memory remember back power stock visit increase its walk.'",
+    "options": {
+      "A": "security",
+      "B": "president",
+      "C": "Yes",
+      "D": "necessary"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Modern article Mrs free see individual sister ability occur performance national help answer.'",
+    "options": {
+      "A": "Yes",
+      "B": "Congress",
+      "C": "themselves",
+      "D": "product"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Audience work above message move Mr fill system tend.'",
+    "options": {
+      "A": "however",
+      "B": "billion",
+      "C": "mother",
+      "D": "Yes"
+    },
+    "answer": "D",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Coach over enjoy specific myself perform better hard.'",
+    "options": {
+      "A": "people",
+      "B": "Yes",
+      "C": "ready",
+      "D": "nearly"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Open lead remain cause none body majority yes soon source.'",
+    "options": {
+      "A": "account",
+      "B": "Yes",
+      "C": "reduce",
+      "D": "second"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Allow court theory can develop specific choose concern more level.'",
+    "options": {
+      "A": "major",
+      "B": "Yes",
+      "C": "right",
+      "D": "knowledge"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Ready generation pattern travel edge contain.'",
+    "options": {
+      "A": "relationship",
+      "B": "television",
+      "C": "Yes",
+      "D": "letter"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Fund responsibility good start husband actually court six light.'",
+    "options": {
+      "A": "Congress",
+      "B": "artist",
+      "C": "Yes",
+      "D": "most"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'You better course argue author involve camera good.'",
+    "options": {
+      "A": "issue",
+      "B": "Yes",
+      "C": "ask",
+      "D": "to"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Focus expert avoid create like hear range.'",
+    "options": {
+      "A": "region",
+      "B": "and",
+      "C": "Yes",
+      "D": "dream"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Again out foot fight network big threat response similar threat cost mouth.'",
+    "options": {
+      "A": "movement",
+      "B": "Yes",
+      "C": "crime",
+      "D": "opportunity"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Admit produce approach marriage article interest purpose day yourself suffer adult attack.'",
+    "options": {
+      "A": "trade",
+      "B": "Yes",
+      "C": "night",
+      "D": "service"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Across financial full have Congress management also attention.'",
+    "options": {
+      "A": "wide",
+      "B": "Yes",
+      "C": "inside",
+      "D": "attack"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Player free open author south name.'",
+    "options": {
+      "A": "fill",
+      "B": "Yes",
+      "C": "summer",
+      "D": "age"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Affect shoulder instead manager item maybe system up kind.'",
+    "options": {
+      "A": "six",
+      "B": "himself",
+      "C": "Yes",
+      "D": "mouth"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Finish create summer big cold article.'",
+    "options": {
+      "A": "write",
+      "B": "enter",
+      "C": "involve",
+      "D": "Yes"
+    },
+    "answer": "D",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Read the passage and answer the question: 'Event be service newspaper never everyone nothing heart condition see may within property.'",
+    "options": {
+      "A": "side",
+      "B": "short",
+      "C": "Yes",
+      "D": "watch"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  }
+]

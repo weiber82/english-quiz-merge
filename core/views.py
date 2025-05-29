@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
 from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
-from .models import User, Favorite, Question, TestRecord
+from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic
 from dotenv import load_dotenv
 import json
 import random
 import os
+import uuid
 
 
 load_dotenv()  # 讀取 .env 檔案
@@ -74,44 +75,61 @@ def dashboard_view(request):
     return render(request, 'dashboard.html')
 
 
+class TestConfig:
+    def __init__(self, topic, count, include_gpt):
+        self.topic = topic
+        self.count = count
+        self.include_gpt = include_gpt
+
+    @classmethod
+    def from_request(cls, request):
+        return cls(
+            topic=request.POST.get("topic"),
+            count=int(request.POST.get("count")),
+            include_gpt=request.POST.get("include_gpt")
+        )
+
+
+class PracticeSession:
+    def __init__(self, config):
+        self.config = config
+        self.test_result_id = str(uuid.uuid4())
+        self.selected_questions = []
+
+    def initialize(self):
+        self.selected_questions = random.sample(
+            Question.get_by_topic(self.config.topic, self.config.include_gpt),
+            k=self.config.count
+        )
+
+    def to_session_data(self):
+        return {
+            'test_result_id': self.test_result_id,
+            'test_config': {
+                'topic': self.config.topic,
+                'count': self.config.count,
+                'include_gpt': self.config.include_gpt,
+            },
+            'test_questions': [q.id for q in self.selected_questions],
+            'answers': {}
+        }
+
+
 def start_test_view(request):
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')
 
     if request.method == 'POST':
-        # 清除舊的測驗紀錄，避免影響正確率與錯題計算
+        # 清除舊紀錄
         request.session.pop('test_questions', None)
         request.session.pop('answers', None)
 
-        import uuid
-        test_result_id = str(uuid.uuid4())
-        request.session['test_result_id'] = test_result_id
+        config = TestConfig.from_request(request)
+        session = PracticeSession(config)
+        session.initialize()
 
-        topic = request.POST.get("topic")
-        count = int(request.POST.get("count"))
-        mode = request.POST.get("mode")
-        include_gpt = request.POST.get("include_gpt")  # 'yes' or 'no'
-
-        request.session['test_config'] = {
-            'topic': topic,
-            'count': count,
-            'mode': mode,
-            'include_gpt': include_gpt
-        }
-
-        # 題庫篩選
-        qs = Question.objects.filter(topic=topic)
-        if include_gpt == 'no':
-            qs = qs.filter(is_gpt_generated=False)
-
-        # 隨機選題
-        selected = random.sample(list(qs), min(count, qs.count()))
-
-        # 存進 session
-        request.session['test_questions'] = [q.id for q in selected]
-        request.session['answers'] = {}
-
+        request.session.update(session.to_session_data())
         return redirect('test_question', question_index=0)
 
     return render(request, 'start_test.html')
@@ -173,39 +191,37 @@ def test_result_view(request):
     if not test_result_id:
         return redirect('start_test')
 
-    records = TestRecord.objects.filter(user_id=user_id, test_result_id=test_result_id)
+    records = TestRecord.get_test_records(user_id, test_result_id)
+    correct_count = TestRecord.get_correct_count(user_id, test_result_id)
+    wrong_records = TestRecord.get_wrong_records(user_id, test_result_id)
 
     total = records.count()
-    correct_count = records.filter(is_correct=True).count()
     accuracy = round((correct_count / total) * 100, 2) if total else 0
-    wrong_records = records.filter(is_correct=False)
 
-
-    # 排序：依照這次測驗的 test_questions 順序
     question_order = request.session.get('test_questions', [])
 
-    # 加上 index 編號（0-based 改成 1-based）
     indexed_wrong_records = []
     for record in wrong_records:
         try:
             seq = question_order.index(record.question.id) + 1
         except ValueError:
             seq = "?"
+        is_starred = Favorite.is_starred(user_id, record.question.id)
         indexed_wrong_records.append({
             'record': record,
-            'seq': seq
+            'seq': seq,
+            'is_starred': is_starred
         })
 
-
-    # 清掉本輪測驗的 ID，避免誤用
-    request.session.pop('test_result_id', None)
-
-    return render(request, 'test_result.html', {
+    # 移到最後頁面真正顯示完再清除
+    response = render(request, 'test_result.html', {
         'correct_count': correct_count,
         'total': total,
         'accuracy': accuracy,
         'wrong_records': indexed_wrong_records
     })
+    request.session.pop('test_result_id', None)
+    return response
 
 
 def gpt_detail_view(request):
@@ -246,12 +262,6 @@ def gpt_detail_view(request):
     })
 
 
-
-def logout_view(request):
-    auth_service.logout(request)
-    return redirect('login')
-
-
 def user_management_view(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -288,9 +298,22 @@ def save_answer_view(request):
 
         user_id = request.session.get('user_id')
         test_result_id = request.session.get('test_result_id')
+
         if user_id and test_result_id:
             question = Question.objects.get(id=qid)
             TestRecord.save_answer(user_id, question, ans, test_result_id)
+
+            # ✅ 如果答錯，就寫入 WrongQuestion
+            if ans != question.answer:
+                try:
+                    current_user = User.objects.get(id=user_id)
+                    WrongQuestion.get_or_create(
+                        user=current_user,
+                        question=question,
+                        defaults={'confirmed': False}
+                    )
+                except User.DoesNotExist:
+                    print(f"❌ 無法寫入錯題，找不到 user_id={user_id} 的使用者")
 
         answers = request.session.get('answers', {})
         answers[qid] = ans
@@ -298,46 +321,151 @@ def save_answer_view(request):
 
         return JsonResponse({'status': 'ok'})
 
-
     return JsonResponse({'error': 'invalid request'}, status=400)
-
-
-@csrf_exempt
-def toggle_star_view(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            user_id = request.session.get('user_id')
-            qid = data.get('qid')
-            question = Question.objects.get(id=qid)
-
-            favorite, created = Favorite.objects.get_or_create(
-                user_id=user_id,
-                question=question
-            )
-
-            if not created:
-                favorite.delete()
-                return JsonResponse({'starred': False})
-            else:
-                return JsonResponse({'starred': True})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    return JsonResponse({'error': 'invalid method'}, status=405)
     
 
-@login_required
 def update_note_view(request, fav_id):
     if request.method == 'POST':
         user_id = request.session.get('user_id')
         note_text = request.POST.get('note', '')
         Favorite.update_note(fav_id, user_id, note_text)  # 封裝在 model 內
-        return redirect('wrong_questions')
+        return redirect('favorite_questions')
 
 
-@login_required
+def favorite_questions_view(request):
+    user_id = request.session.get('user_id')
+    favorites = Favorite.get_user_favorites(user_id)
+    return render(request, 'favorite_questions.html', {'favorites': favorites})
+
+
+@csrf_protect
+def toggle_favorite_view(request, question_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'unauthorized'}, status=403)
+        return redirect('login')
+
+    is_starred = Favorite.toggle_star(user_id=user_id, question_id=question_id)
+
+    # ✅ 如果是 AJAX 請求（例如 GPT 詳解頁），回傳 JSON，不刷新頁面
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'ok', 'starred': is_starred})
+
+    # ✅ 否則仍支援表單 redirect（例如其他頁用 form POST）
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER')
+    if next_url:
+        return redirect(next_url)
+    return redirect('favorite_questions')
+
+
 def wrong_questions_view(request):
     user_id = request.session.get('user_id')
-    favorites = Favorite.get_user_favorites(user_id)  # 呼叫封裝好的方法
-    return render(request, 'wrong_questions.html', {'favorites': favorites})
+    if not user_id:
+        return redirect('login')
 
+    selected_topic = request.GET.get('topic', None)
+
+    current_user = User.get_by_id(user_id)
+    if not current_user:
+        request.session.pop('user_id', None)
+        return redirect('login')
+
+    wrong_list = WrongQuestion.get_unconfirmed_by_user_and_topic(
+        user=current_user, 
+        topic=selected_topic
+    )
+
+    available_topics = WrongQuestion.get_distinct_topics_for_unconfirmed_by_user(
+        user=current_user
+    )
+
+    context = {
+        'wrong_questions': wrong_list,
+        'available_topics': available_topics,
+        'current_topic': selected_topic if selected_topic else 'all'
+    }
+    return render(request, 'wrong_questions.html', context)
+
+
+def diagnose_weakness_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    current_user = User.get_by_id(user_id)
+    if not current_user:
+        request.session.pop('user_id', None)
+        return redirect('login')
+
+    analysis_result = {
+        "weak_topics": [],
+        "summary": "點擊「開始進行弱點分析」按鈕來查看您的 AI 診斷報告。"
+    }
+
+    if request.method == 'POST':
+        all_user_wrong_questions_count = WrongQuestion.get_unconfirmed_by_user_and_topic(user=current_user).count()
+        sample_count = all_user_wrong_questions_count // 2
+        if sample_count == 0 and all_user_wrong_questions_count > 0:
+            sample_count = 1
+
+        wrong_questions_for_analysis = WrongQuestion.get_sample_for_weakness_analysis(current_user, sample_count)
+
+        if wrong_questions_for_analysis:
+            data_for_gpt = []
+            for wq_object in wrong_questions_for_analysis:
+                data_for_gpt.append({
+                    'question_obj': wq_object.question,
+                })
+
+            import os
+            from .services.gpt_service import GPTExplanationService
+            from .services.openai_client import OpenAIClient
+
+            if os.getenv("OPENAI_API_KEY"):
+                client = OpenAIClient(api_key=os.getenv("OPENAI_API_KEY"))
+                gpt_service = GPTExplanationService(gpt_client=client)
+
+                predefined_topics = None
+                current_analysis_from_service = gpt_service.analyze_weaknesses(
+                    data_for_gpt, predefined_weak_topics=predefined_topics)
+
+                analysis_result["summary"] = current_analysis_from_service.get("summary", "AI分析未能提供有效的文字摘要。")
+                analysis_result["weak_topics"] = current_analysis_from_service.get("weak_topics", [])
+
+                if analysis_result["weak_topics"]:
+                    for topic_name in analysis_result["weak_topics"]:
+                        if topic_name:
+                            WeakTopic.update_or_create_weak_topic(current_user, topic_name)
+            else:
+                analysis_result["summary"] = "OpenAI API 金鑰未設定，無法進行 AI 分析。"
+        else:
+            analysis_result["summary"] = "沒有足夠的錯題進行分析（目前選取0題）。"
+
+    existing_weak_topics = WeakTopic.get_weak_topics_for_user(current_user)
+
+    context = {
+        'analysis_summary': analysis_result.get("summary"),
+        'existing_weak_topics': existing_weak_topics,
+        'page_title': "AI 弱點診斷"
+    }
+    return render(request, 'weakness_analysis_result.html', context)
+
+
+def grade_history_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    current_user = User.get_by_id(user_id)
+    if not current_user:
+        request.session.pop('user_id', None)
+        return redirect('login')
+
+    test_history_details = TestRecord.get_recent_test_session_summaries(user=current_user, limit=10)
+
+    context = {
+        'test_history': test_history_details,
+        'page_title': "測驗歷史記錄"
+    }
+    return render(request, 'grade_history.html', context)

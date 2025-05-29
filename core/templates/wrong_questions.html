@@ -1,22 +1,76 @@
-{% extends "home.html" %}
-{% block content %}
-<h2>收藏筆記（S10）</h2>
-
-{% if favorites %}
-    {% for item in favorites %}
-        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
-            <p><strong>題目：</strong> {{ item.question.content }}</p>
-
-            <form method="POST" action="{% url 'update_note' item.id %}">
-                {% csrf_token %}
-                <label>筆記：</label><br>
-                <textarea name="note" rows="3" cols="60">{{ item.note }}</textarea><br>
-                <button type="submit">儲存筆記</button>
-            </form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的錯題本</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding-top: 20px; } /* 簡單的頁面邊距 */
+        .container { max-width: 960px; }
+        .list-group-item { margin-bottom: 1rem; }
+        .alert-info { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>我的錯題本 (S5 功能)</h2>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a>
         </div>
-    {% endfor %}
-{% else %}
-    <p>目前尚無筆記收藏。</p>
-{% endif %}
+        <hr>
 
-{% endblock %}
+        {# --- Topic 篩選區域 --- #}
+        <div class="topic-filter mb-3">
+            <strong>篩選主題：</strong>
+            <a href="{% url 'my_wrong_questions' %}" class="btn btn-sm {% if current_topic == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">全部錯題</a>
+            {% for topic_name in available_topics %}
+                <a href="{% url 'my_wrong_questions' %}?topic={{ topic_name }}" class="btn btn-sm {% if current_topic == topic_name %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ topic_name }}</a>
+            {% endfor %}
+        </div>
+        {# --- Topic 篩選區域結束 --- #}
+
+        {% if wrong_questions %}
+            <ul class="list-group list-group-flush">
+                {% for wq in wrong_questions %}
+                    <li class="list-group-item">
+                        <h5 class="mb-1">題目 {{ forloop.counter }}：</h5>
+                        <p>{{ wq.question.content|linebreaksbr }}</p> {# 顯示題目內容 #}
+                        
+                        {% if wq.note %}
+                            <div class="alert alert-info" role="alert">
+                                <strong>我的筆記：</strong> {{ wq.note|linebreaksbr }} {# 顯示筆記 #}
+                            </div>
+                        {% endif %}
+                        
+                        <p><small class="text-muted">最後答錯時間：{{ wq.last_wrong_time }}</small></p>
+                        
+                        <a href="{% url 'gpt_detail' %}?qid={{ wq.question.id }}" class="btn btn-sm btn-info">查看 GPT 詳解</a>
+                        
+                        {% comment %}
+                        <form method="post" action="{% url 'mark_as_reviewed' wq.id %}" style="display: inline-block; margin-left: 10px;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success mt-2">我已複習 ✅</button>
+                        </form>
+                        {% endcomment %}
+
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-success mt-3" role="alert">
+                {% if current_topic == 'all' or not current_topic %}
+                    太棒了！你的錯題本目前是空的！ 🎉
+                {% else %}
+                    太棒了！你在「{{ current_topic }}」這個主題下沒有錯題！🎉
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

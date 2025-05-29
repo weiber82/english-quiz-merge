@@ -60,45 +60,73 @@
       <p style="white-space: pre-wrap;">{{ explanation }}</p>
     </div>
 
-    <!-- 收藏星星 + 文字 -->
+    <!-- AJAX 星星收藏按鈕（使用 JS 控制顯示） -->
     <div class="text-center mt-4">
-      <button id="starBtn" class="star-btn" onclick="toggleStar()" title="加入或取消收藏">
-        {% if is_starred %}
-          <span class="text-primary text-star">⭐ 已收藏</span>
-        {% else %}
-          <span class="text-warning text-star">☆ 加入收藏</span>
-        {% endif %}
+      <button class="star-btn" onclick="toggleFavorite('{{ question.id }}')" title="加入或取消收藏">
+        <span id="star-icon" class="text-star" data-starred="{{ is_starred|yesno:'true,false' }}">
+          <!-- 初始內容會由 JS 渲染 -->
+        </span>
       </button>
     </div>
 
+    <!-- 返回上一頁按鈕 -->
     <div class="text-center mt-4">
-      {% if next_index %}
-        <a href="/test/{{ next_index }}/" class="btn btn-primary">下一題</a>
-      {% endif %}
+      <button onclick="history.back()" class="btn btn-outline-secondary">← 返回上一頁</button>
     </div>
+
   </div>
 </div>
 
+<!-- CSRF + AJAX 收藏腳本 -->
 <script>
-  const questionId = "{{ question.id }}";
-  const btn = document.getElementById("starBtn");
-
-  function toggleStar() {
-    fetch("/api/toggle-star/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token }}"
-      },
-      body: JSON.stringify({ qid: questionId })
-    })
-    .then(response => response.json())
-    .then(data => {
-      btn.innerHTML = data.starred
-        ? `<span class="text-primary text-star">⭐ 已收藏</span>`
-        : `<span class="text-warning text-star">☆ 加入收藏</span>`;
-    });
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const trimmed = cookie.trim();
+      if (trimmed.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+        break;
+      }
+    }
   }
+  return cookieValue;
+}
+
+function renderStar() {
+  const icon = document.getElementById("star-icon");
+  const isStarred = icon.dataset.starred === "true";
+
+  if (isStarred) {
+    icon.innerHTML = '<span class="text-primary">⭐ 已收藏</span>';
+  } else {
+    icon.innerHTML = '<span class="text-warning">☆ 加入收藏</span>';
+  }
+}
+
+function toggleFavorite(qid) {
+  fetch(`/toggle-favorite/${qid}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const icon = document.getElementById("star-icon");
+    icon.dataset.starred = data.starred ? "true" : "false";
+    renderStar();
+  })
+  .catch(err => {
+    alert("操作失敗，請稍後再試");
+    console.error(err);
+  });
+}
+
+// 初始渲染星星
+renderStar();
 </script>
 
 </body>

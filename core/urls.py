@@ -17,7 +17,10 @@ urlpatterns = [
     path('api/save-answer/', views.save_answer_view, name='save_answer'),
     path('gpt/', views.gpt_detail_view, name='gpt_detail'),
     path('gpt/manual/', views.home, name='gpt_manual'),
-    path('api/toggle-star/', views.toggle_star_view, name='toggle_star'),
+    path('toggle-favorite/<int:question_id>/', views.toggle_favorite_view, name='toggle_favorite'),
     path('wrong-note/<int:fav_id>/', views.update_note_view, name='update_note'),
-    path('wrong-questions/', views.wrong_questions_view, name='wrong_questions'),
+    path('favorites/', views.favorite_questions_view, name='favorite_questions'),
+    path('wrong-questions/', views.wrong_questions_view, name='my_wrong_questions'),
+    path('diagnose-weakness/', views.diagnose_weakness_view, name='diagnose_weakness'),
+    path('grade-history/', views.grade_history_view, name='grade_history'),
 ]
