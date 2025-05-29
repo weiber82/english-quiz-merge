@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
 from .services.gpt_service import GPTExplanationService
@@ -88,6 +88,16 @@ class TestConfig:
             count=int(request.POST.get("count")),
             include_gpt=request.POST.get("include_gpt")
         )
+    
+
+    def to_session_data(self):
+        return {
+            'test_config': {
+                'topic': self.topic,
+                'count': self.count,
+                'include_gpt': self.include_gpt
+            }
+    }
 
 
 class PracticeSession:
@@ -143,7 +153,9 @@ def test_question_view(request, question_index):
     if 'test_questions' not in request.session:
         topic = config['topic']
         count = config['count']
-        all_questions = list(Question.objects.filter(topic=topic))
+        include_gpt = config['include_gpt']
+
+        all_questions = Question.get_by_topic(topic, include_gpt)
         selected = random.sample(all_questions, min(count, len(all_questions)))
         request.session['test_questions'] = [q.id for q in selected]
         request.session['answers'] = {}
@@ -153,26 +165,25 @@ def test_question_view(request, question_index):
         return redirect('dashboard')
 
     selected_answer = None
-    if request.method == 'POST':
+    if request.method == 'POST':        
         selected_answer = request.POST.get('answer')
-        question = Question.objects.get(id=question_ids[question_index])
+        question = Question.get_by_id(question_ids[question_index])
+
         answers = request.session.get('answers', {})
         answers[str(question.id)] = selected_answer
         request.session['answers'] = answers
+        request.session.modified = True  # ⭐⭐ ←← 這行是關鍵！加上它才能真的寫進 session！
 
         user_id = request.session.get('user_id')
         test_result_id = request.session.get('test_result_id')
 
-        print("user_id:", user_id)
-        print("test_result_id:", test_result_id)
-        print("selected:", selected_answer)
+        print("✅ 寫入 session['answers']:", answers)
 
         if user_id and test_result_id:
             TestRecord.save_answer(user_id, question, selected_answer, test_result_id)
 
-
     else:
-        question = Question.objects.get(id=question_ids[question_index])
+        question = Question.get_by_id(question_ids[question_index])
 
     return render(request, 'test_question.html', {
         'question': question,
@@ -227,10 +238,14 @@ def test_result_view(request):
 def gpt_detail_view(request):
     user_id = request.session.get('user_id')
     qid = int(request.GET.get('qid'))
-    question = Question.objects.get(id=qid)
+    question = Question.get_by_id(qid)
+    if not question:
+        return HttpResponseNotFound("題目不存在")
 
     # 查詢是否已收藏
-    is_starred = Favorite.objects.filter(user_id=user_id, question=question).exists()
+    # is_starred = Favorite.objects.filter(user_id=user_id, question=question).exists()
+    is_starred = Favorite.is_starred(user_id=user_id, question_id=question.id)
+
 
     # 找下一題編號（如果有）
     test_questions = request.session.get('test_questions', [])
@@ -267,7 +282,8 @@ def user_management_view(request):
     if not user_id:
         return redirect('login')
 
-    current_user = User.objects.get(id=user_id)
+    # current_user = User.objects.get(id=user_id)
+    current_user = User.get_by_id(user_id)
     if current_user.role != 'admin':
         return HttpResponseForbidden("你沒有權限瀏覽此頁面")
 
@@ -279,13 +295,15 @@ def user_management_view(request):
             messages.error(request, "無法修改自己的權限。")
             return redirect('user_management')
 
-        target_user = User.objects.get(id=target_id)
+        # target_user = User.objects.get(id=target_id)
+        target_user = User.get_by_id(target_id)
         target_user.role = new_role
         target_user.save()
         messages.success(request, f"使用者 {target_user.username} 已更新為 {new_role}。")
         return redirect('user_management')
 
-    users = User.objects.all()
+    # users = User.objects.all()
+    users = User.get_all()
     return render(request, 'user_management.html', {'users': users})
 
 
@@ -300,13 +318,14 @@ def save_answer_view(request):
         test_result_id = request.session.get('test_result_id')
 
         if user_id and test_result_id:
-            question = Question.objects.get(id=qid)
+            question = Question.get_by_id(qid)
             TestRecord.save_answer(user_id, question, ans, test_result_id)
 
             # ✅ 如果答錯，就寫入 WrongQuestion
             if ans != question.answer:
                 try:
-                    current_user = User.objects.get(id=user_id)
+                    # current_user = User.objects.get(id=user_id)
+                    current_user = User.get_by_id(user_id)
                     WrongQuestion.get_or_create(
                         user=current_user,
                         question=question,

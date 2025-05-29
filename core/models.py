@@ -33,6 +33,10 @@ class User(models.Model):
             return cls.objects.get(id=user_id)
         except cls.DoesNotExist:
             return None
+        
+    @classmethod
+    def get_all(cls):
+        return cls.objects.all()
 
 
 class Question(models.Model):
@@ -46,12 +50,26 @@ class Question(models.Model):
     def __str__(self):
         return self.content[:30]
 
-    @staticmethod
-    def get_by_topic(topic, include_gpt):
-        qs = Question.objects.filter(topic=topic)
+    #  依據 ID 取得單題（物件導向封裝）
+    @classmethod
+    def get_by_id(cls, qid):
+        try:
+            return cls.objects.get(id=qid)
+        except cls.DoesNotExist:
+            return None
+
+    #  依據主題與是否包含 GPT 題目取得題目清單
+    @classmethod
+    def get_by_topic(cls, topic, include_gpt):
+        qs = cls.objects.filter(topic=topic)
         if include_gpt == 'no':
             qs = qs.filter(is_gpt_generated=False)
-        return list(qs)      
+        return list(qs)
+
+    #  依 ID 清單取得多筆題目（例如考卷題目）
+    @classmethod
+    def get_bulk_by_ids(cls, id_list):
+        return cls.objects.filter(id__in=id_list) 
     
 
 class TestRecord(models.Model):
