@@ -7,6 +7,7 @@ from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
 from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic
+from .forms import QuestionForm
 from dotenv import load_dotenv
 import json
 import random
@@ -489,6 +490,81 @@ def grade_history_view(request):
     }
     return render(request, 'grade_history.html', context)
 
+# feature/A1
+# A1 題庫管理 首頁
+def manage_questions_index_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    
+    selected_topic = request.GET.get('topic', None)
+
+    current_user = User.get_by_id(user_id)
+    if not current_user:
+        request.session.pop('user_id', None)
+        return redirect('login')
+
+    question_list = Question.get_by_topic(
+        topic=selected_topic,
+        include_gpt='no'
+    )
+
+    topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
+
+    context = {
+        'all_questions': question_list,
+        'topics': topics,
+        'current_topic': selected_topic if selected_topic else 'all'
+    }
+    return render(request, 'manage_questions/index.html', context)
+    
+# A1 題庫管理 新增
+def manage_questions_create_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_questions_index')  # 你可以換成你要導向的頁面
+    else:
+        form = QuestionForm()
+
+    return render(request, 'manage_questions/create.html', {'form': form})
+
+# A1 題庫管理 編輯
+def manage_questions_edit_view(request, question_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    question = get_object_or_404(Question, id=question_id)
+
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_questions_index')
+    else:
+        form = QuestionForm(instance=question)
+
+    return render(request, 'manage_questions/edit.html', {'form': form, 'question': question})
+
+# A1 題庫管理 刪除
+def manage_questions_delete_view(request, question_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    try:
+        question = Question.objects.get(id=question_id)
+        question.delete()
+        messages.success(request, "題目已成功刪除。")
+    except Question.DoesNotExist:
+        messages.warning(request, "這筆資料不存在或已被刪除。")
+    return redirect('manage_questions_index')
+=======
 
 class WrongChallengeSession:
     def __init__(self, user):

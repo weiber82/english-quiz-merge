@@ -23,6 +23,12 @@ urlpatterns = [
     path('wrong-questions/', views.wrong_questions_view, name='my_wrong_questions'),
     path('diagnose-weakness/', views.diagnose_weakness_view, name='diagnose_weakness'),
     path('grade-history/', views.grade_history_view, name='grade_history'),
+# feature/A1
+    path('manage-questions/index/', views.manage_questions_index_view, name='manage_questions_index'),
+    path('manage-questions/create/', views.manage_questions_create_view, name='manage_questions_create'),
+    path('manage-questions/edit/<int:question_id>/', views.manage_questions_edit_view, name='manage_questions_edit'),
+    path('manage-questions/delete/<int:question_id>/', views.manage_questions_delete_view, name='manage_questions_delete'),
+
     path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
     path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
 ]
