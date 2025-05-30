@@ -12,6 +12,54 @@
         .container { max-width: 960px; }
         .list-group-item { margin-bottom: 1rem; }
         .alert-info { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+
+        .accordion-toggle-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background-color: #f8f9fa;
+            border: none;
+            font-weight: bold;
+            padding: 12px 16px;
+            font-size: 1.05rem;
+            transition: background-color 0.3s ease;
+        }
+      
+        .accordion-toggle-btn:hover {
+            text-decoration: none !important;
+            background-color: #e2e6ea;
+            cursor: pointer;
+        }
+      
+        .accordion-toggle-btn:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .bi {
+            font-size: 1.2rem;
+            cursor: pointer;
+          }
+        
+        .drop-zone {
+            border: 2px dashed #007bff;
+            padding: 40px;
+            text-align: center;
+            color: #888;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+          }
+        
+        .drop-zone.dragover {
+            background-color: #e2e6ea;
+            border-color: #0056b3;
+        }
+    
+        .file-name {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -20,10 +68,249 @@
             <h2>Excel 題庫匯入（A2）</h2>
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a>
         </div>
+        <form method="post" action="{% url 'import_excel_upload_file' %}" enctype="multipart/form-data" class="form-row align-items-start mb-4">
+            {% csrf_token %}
+          
+            <!-- 拖曳區塊 -->
+            <div class="form-group col-md-5 pr-3">
+              <label for="excel_file" class="font-weight-bold">📥 匯入 Excel 題庫</label>
+              <div id="dropZone" class="drop-zone mt-1">
+                拖曳檔案到這裡，或點擊此區選擇檔案
+                <ul id="fileList" class="list-unstyled"></ul>
+                {% comment %} <div id="fileName" class="file-name text-success mt-2 d-flex align-items-center" style="gap: 8px;"></div> {% endcomment %}
+              </div>
+              <input type="file" name="excel_file" id="excel_file" accept=".xlsx" multiple required hidden>
+            </div>
+          
+            <!-- 上傳按鈕 -->
+            <div class="form-group col-auto mt-4">
+              <button type="submit" id="uploadBtn" class="btn btn-success" disabled>上傳並預覽</button>
+            </div>
+          
+            <!-- 下載模板 -->
+            <div class="form-group col-auto mt-4">
+              <a href="{% url 'import_excel_download_template' %}" class="btn btn-outline-primary ml-2">下載模板</a>
+            </div>
+        </form>
+        {% if error %}
+            <div id="alertBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="關閉">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+        {% endif %}
+          
+        {% if preview_questions %}
         <hr>
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+            <h4 class="mb-0">題庫預覽</h4>
+            <div>
+                <a href="{% url 'import_excel_confirm' %}" class="btn btn-danger mr-2">匯入我的題庫</a>
+                <a href="{% url 'import_excel_cancel_preview' %}" class="btn btn-outline-secondary">取消預覽</a>
+            </div>
+        </div>
+        {% if preview_questions.has_other_pages %}
+            <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                {% if preview_questions.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ preview_questions.previous_page_number }}" aria-label="上一頁">
+                    <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                {% endif %}
+
+                {% for num in preview_questions.paginator.page_range %}
+                {% if preview_questions.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if preview_questions.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ preview_questions.next_page_number }}" aria-label="下一頁">
+                    <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+            </ul>
+            </nav>
+        {% endif %}
+        <ul class="list-group list-group-flush" id="questionAccordion">
+            {% for q in preview_questions %}
+            <div class="card mb-2">
+                <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ forloop.counter }}">
+                    <button class="accordion-toggle-btn" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
+                        aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                        題目 {{ preview_questions.start_index|add:forloop.counter0 }}
+                    </button>
+                    {% comment %} <div class="d-flex align-items-center">
+                        <a href="{% url 'manage_questions_edit' q.id %}" class="text-secondary mr-3" title="編輯">
+                          <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="#" class="text-secondary ml-3" title="刪除"
+                            data-toggle="modal"
+                            data-target="#deleteModal"
+                            data-url="{% url 'manage_questions_delete' q.id %}"
+                            data-title="題目 {{ forloop.counter }}">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </div> {% endcomment %}
+                </div>
+                <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}"
+                  data-parent="#questionAccordion">
+                  <div class="card-body">
+            
+                    <!-- 題目內容 -->
+                    <div class="border rounded p-3 mb-3 bg-light">
+                      <strong>題目內容：</strong>
+                      <p class="mb-0">{{ q.content|linebreaksbr }}</p>
+                    </div>
+            
+                    <!-- 題目選項 -->
+                    <div class="border rounded p-3 mb-3">
+                      <strong>選項：</strong>
+                      <ul class="list-unstyled mt-2 mb-0">
+                        {% for key, value in q.options.items %}
+                          <li><strong>{{ key }}.</strong> {{ value }}</li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+            
+                    <!-- 正確答案 -->
+                    <div class="border rounded p-3 mb-3 bg-light">
+                      <strong>正確答案：</strong>
+                      <span class="text-success font-weight-bold">{{ q.answer }}</span>
+                    </div>
+            
+                    <!-- 時間 -->
+                    {% comment %} <p><small class="text-muted">新增時間：{{ q.created_dt }}</small></p> {% endcomment %}
+            
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+        </ul>
+        {% if preview_questions.has_other_pages %}
+            <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                {% if preview_questions.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ preview_questions.previous_page_number }}" aria-label="上一頁">
+                    <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                {% endif %}
+
+                {% for num in preview_questions.paginator.page_range %}
+                {% if preview_questions.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if preview_questions.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ preview_questions.next_page_number }}" aria-label="下一頁">
+                    <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+            </ul>
+            </nav>
+        {% endif %}
+        {% endif %}
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const dropZone = document.getElementById("dropZone");
+        const fileInput = document.getElementById("excel_file");
+        const fileList = document.getElementById("fileList");
+        const uploadBtn = document.getElementById("uploadBtn");
+      
+        let selectedFiles = [];
+      
+        dropZone.addEventListener("click", () => fileInput.click());
+      
+        dropZone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropZone.classList.add("dragover");
+        });
+      
+        dropZone.addEventListener("dragleave", () => {
+          dropZone.classList.remove("dragover");
+        });
+      
+        dropZone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("dragover");
+          handleFiles(e.dataTransfer.files);
+        });
+      
+        fileInput.addEventListener("change", () => {
+          handleFiles(fileInput.files);
+        });
+      
+        function handleFiles(files) {
+          for (let file of files) {
+            if (!selectedFiles.find(f => f.name === file.name)) {
+              selectedFiles.push(file);
+            }
+          }
+          updateFileList();
+        }
+      
+        function updateFileList() {
+          fileList.innerHTML = '';
+          selectedFiles.forEach((file, index) => {
+            const li = document.createElement('li');
+            li.className = 'mb-1 d-flex justify-content-between align-items-center bg-light p-2 rounded';
+            li.innerHTML = `
+              <span>${file.name}</span>
+              <a href="#" class="text-danger ml-2 remove-file" data-index="${index}" title="取消">
+                <i class="bi bi-x-circle-fill" style="font-size: 1.2rem;"></i>
+              </a>
+            `;
+            fileList.appendChild(li);
+          });
+      
+          document.querySelectorAll('.remove-file').forEach(el => {
+            el.addEventListener('click', (e) => {
+              e.preventDefault();
+              const index = e.target.closest('a').dataset.index;
+              selectedFiles.splice(index, 1);
+              updateFileList();
+            });
+          });
+      
+          // 建立新的 FileList 給 input
+          const dataTransfer = new DataTransfer();
+          selectedFiles.forEach(file => dataTransfer.items.add(file));
+          fileInput.files = dataTransfer.files;
+      
+          uploadBtn.disabled = selectedFiles.length === 0;
+
+        }
+
+        // 自動在 3 秒後關閉 alert
+        setTimeout(function () {
+            $('#alertBox').alert('close');
+        }, 1000);
+    </script>
 </body>
 </html>
