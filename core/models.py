@@ -316,3 +316,13 @@ class WrongQuestion(models.Model):
         if actual_sample_count > 0:
             return random.sample(list(all_user_wrong_questions), actual_sample_count)
         return []
+    
+    @classmethod
+    def get_unfixed_by_user(cls, user):
+        return cls.objects.filter(user=user, confirmed=False).select_related('question')
+
+    @classmethod
+    def mark_as_wrong(cls, user, question):
+        obj, _ = cls.objects.get_or_create(user=user, question=question)
+        obj.last_wrong_time = timezone.now()
+        obj.save()
