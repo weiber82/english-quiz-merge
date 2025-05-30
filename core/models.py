@@ -319,7 +319,7 @@ class WrongQuestion(models.Model):
     
     @classmethod
     def get_unfixed_by_user(cls, user):
-        return cls.objects.filter(user=user, is_fixed=False).select_related('question')
+        return cls.objects.filter(user=user, confirmed=False).select_related('question')
 
     @classmethod
     def mark_as_wrong(cls, user, question):
