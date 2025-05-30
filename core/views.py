@@ -488,3 +488,57 @@ def grade_history_view(request):
         'page_title': "測驗歷史記錄"
     }
     return render(request, 'grade_history.html', context)
+
+
+class WrongChallengeSession:
+    def __init__(self, user):
+        self.user = user
+        self.selected_questions = []
+
+    def initialize(self, count=5):
+        wrong_questions = WrongQuestion.get_unfixed_by_user(self.user)
+        self.selected_questions = random.sample(
+            [wq.question for wq in wrong_questions],
+            min(count, len(wrong_questions))
+        )
+
+def start_wrong_challenge(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    current_user = User.get_by_id(user_id)
+    session = WrongChallengeSession(current_user)
+    session.initialize(count=5)
+
+    request.session['challenge_questions'] = [q.id for q in session.selected_questions]
+    request.session.modified = True
+
+    return render(request, 'wrong_challenge.html', {
+        'questions': session.selected_questions
+    })
+
+def submit_wrong_challenge(request):
+    user_id = request.session.get('user_id')
+    if not user_id or request.method != 'POST':
+        return redirect('login')
+
+    current_user = User.get_by_id(user_id)
+    question_ids = request.session.get('challenge_questions', [])
+    correct_count = 0
+
+    for qid in question_ids:
+        selected = request.POST.get(f'question_{qid}')
+        q = Question.get_by_id(qid)
+        if selected == q.answer:
+            correct_count += 1
+        else:
+            WrongQuestion.mark_as_wrong(current_user, q)
+
+    score = round((correct_count / len(question_ids)) * 100) if question_ids else 0
+
+    return render(request, 'challenge_result.html', {
+        'score': score,
+        'total': len(question_ids),
+        'correct': correct_count
+    })
