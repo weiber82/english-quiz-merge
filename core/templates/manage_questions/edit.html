@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>題庫管理</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { padding-top: 20px; } /* 簡單的頁面邊距 */
+        .container { max-width: 960px; }
+        .list-group-item { margin-bottom: 1rem; }
+        .alert-info { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+
+        label {
+        font-weight: bold;
+        font-size: 1.1rem;
+        }
+        .option-label {
+            font-weight: normal;
+            font-size: 0.95rem;
+        }
+    
+        .option-group {
+            margin-left: 1rem;  /* 整體縮排感 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>題庫管理（A1）-編輯功能</h2>
+            <a href="{% url 'manage_questions_index' %}" class="btn btn-secondary">取消編輯</a>
+        </div>
+        <hr>
+
+        <form method="post" id="questionForm" novalidate>
+            {% csrf_token %}
+    
+            <!-- 主題 -->
+            <div class="form-group bg-light border rounded p-3 mb-3">
+                <label for="{{ form.topic.id_for_label }}">主題</label>
+                {{ form.topic }}
+                {% if form.topic.errors %}
+                <small class="form-text text-danger">{{ form.topic.errors }}</small>
+                {% endif %}
+            </div>
+
+            <!-- 題目內容 -->
+            <div class="form-group bg-white border rounded p-3 mb-3">
+                <label for="{{ form.content.id_for_label }}">題目內容</label>
+                {{ form.content }}
+                {% if form.content.errors %}
+                    <small class="form-text text-danger">{{ form.content.errors }}</small>
+                {% endif %}
+            </div>
+
+            <!-- 選項 -->
+            <div class="form-group bg-light border rounded p-3 mb-3">
+                <label>選項</label>
+                <div class="form-group option-group">
+                    <label class="option-label">選項 A</label>
+                    <input type="text" class="form-control" id="optA" required>
+                </div>
+                <div class="form-group option-group">
+                    <label class="option-label">選項 B</label>
+                    <input type="text" class="form-control" id="optB" required>
+                </div>
+                <div class="form-group option-group">
+                    <label class="option-label">選項 C</label>
+                    <input type="text" class="form-control" id="optC" required>
+                </div>
+                <div class="form-group option-group">
+                    <label class="option-label">選項 D</label>
+                    <input type="text" class="form-control" id="optD" required>
+                </div>
+            </div>
+
+            <!-- 正確答案 -->
+            <div class="form-group bg-white border rounded p-3 mb-3">
+                <label for="{{ form.answer.id_for_label }}">正確答案</label>
+                {{ form.answer }}
+                {% if form.answer.errors %}
+                    <small class="form-text text-danger">{{ form.answer.errors }}</small>
+                {% endif %}
+            </div>
+        
+            
+
+            {{ form.options }}
+            <button type="submit" class="btn btn-primary mt-3">儲存</button>
+          </form>
+    </div>
+    <!-- JavaScript: 組合 options 成 JSON 放進隱藏欄位 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const options = {{ question.options|safe }};
+    
+            if (options["A"]) document.getElementById("optA").value = options["A"];
+            if (options["B"]) document.getElementById("optB").value = options["B"];
+            if (options["C"]) document.getElementById("optC").value = options["C"];
+            if (options["D"]) document.getElementById("optD").value = options["D"];
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

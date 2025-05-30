@@ -70,8 +70,8 @@ class Question(models.Model):
     @classmethod
     def get_bulk_by_ids(cls, id_list):
         return cls.objects.filter(id__in=id_list) 
+        
     
-
 class TestRecord(models.Model):
     test_result_id = models.CharField(max_length=64) 
 
