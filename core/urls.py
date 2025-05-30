@@ -29,4 +29,6 @@ urlpatterns = [
     path('manage-questions/delete/<int:question_id>/', views.manage_questions_delete_view, name='manage_questions_delete'),
     path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
     path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
+    path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
+    path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
 ]

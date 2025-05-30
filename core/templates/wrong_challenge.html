@@ -1,0 +1,22 @@
+{% load static %}
+
+{% block content %}
+<h2>錯題挑戰模式</h2>
+
+<form method="post" action="{% url 'submit_wrong_challenge' %}">
+  {% csrf_token %}
+  {% for question in questions %}
+    <div class="question-block">
+      <p><strong>Q{{ forloop.counter }}:</strong> {{ question.content }}</p>
+      {% for option in question.options %}
+        <label>
+          <input type="radio" name="question_{{ question.id }}" value="{{ option }}">
+          {{ option }}
+        </label><br>
+      {% endfor %}
+    </div>
+    <hr>
+  {% endfor %}
+  <button type="submit">提交挑戰</button>
+</form>
+{% endblock %}

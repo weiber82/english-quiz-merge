@@ -36,12 +36,12 @@
         <a href="{% url 'diagnose_weakness' %}" class="btn btn-outline-secondary w-100 btn-list">🧠 AI 弱點診斷分析（S6）</a>
         <a href="{% url 'grade_history' %}" class="btn btn-outline-secondary w-100 btn-list">📈 成績查詢與趨勢追蹤（S7）</a>
         <a href="#" class="btn btn-outline-secondary w-100 btn-list">🗣️ 測驗回饋與評價（S8）</a>
-        <a href="#" class="btn btn-outline-secondary w-100 btn-list">🎮 錯題挑戰模式（S9）</a>
+        <a href="{% url 'wrong_challenge' %}" class="btn btn-outline-secondary w-100 btn-list">🎮 錯題挑戰模式（S9）</a>
         <a href="{% url 'favorite_questions' %}" class="btn btn-outline-secondary w-100 btn-list">📝 收錄筆記（S10）</a>
         <a href="#" class="btn btn-outline-secondary w-100 btn-list">🎯 AI 題型精練模式（S11）</a>
 
         <h5 class="mt-4 text-success">🛠️ 系統管理功能（A 系列）</h5>
-        <a href="#" class="btn btn-outline-dark w-100 btn-list">🧮 題庫管理（A1）</a>
+        <a href="{% url 'manage_questions_index' %}" class="btn btn-outline-dark w-100 btn-list">🧮 題庫管理（A1）</a>
         <a href="#" class="btn btn-outline-dark w-100 btn-list">📤 Excel 題庫匯入（A2）</a>
         <a href="#" class="btn btn-outline-dark w-100 btn-list">🔐 使用者權限管理（A3）</a>
         <a href="#" class="btn btn-outline-dark w-100 btn-list">📊 測驗分析與報表下載（A4）</a>

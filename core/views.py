@@ -3,12 +3,14 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
+from django.http import FileResponse
 from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
 from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic
 from .forms import QuestionForm
 from dotenv import load_dotenv
+
 import json
 import random
 import os
@@ -490,6 +492,33 @@ def grade_history_view(request):
     }
     return render(request, 'grade_history.html', context)
 
+# A1 題庫管理 首頁
+def manage_questions_index_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    
+    selected_topic = request.GET.get('topic', None)
+
+    current_user = User.get_by_id(user_id)
+    if not current_user:
+        request.session.pop('user_id', None)
+        return redirect('login')
+
+    question_list = Question.get_by_topic(
+        topic=selected_topic,
+        include_gpt='no'
+    )
+
+    topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
+
+    context = {
+        'all_questions': question_list,
+        'topics': topics,
+        'current_topic': selected_topic if selected_topic else 'all'
+    }
+    return render(request, 'manage_questions/index.html', context)
+
 # A1 題庫管理 新增
 def manage_questions_create_view(request):
     user_id = request.session.get('user_id')
@@ -536,3 +565,56 @@ def manage_questions_delete_view(request, question_id):
     except Question.DoesNotExist:
         messages.warning(request, "這筆資料不存在或已被刪除。")
     return redirect('manage_questions_index')
+
+class WrongChallengeSession:
+    def __init__(self, user):
+        self.user = user。
+        self.selected_questions = []
+
+    def initialize(self, count=5):
+        wrong_questions = WrongQuestion.get_unfixed_by_user(self.user)
+        self.selected_questions = random.sample(
+            [wq.question for wq in wrong_questions],
+            min(count, len(wrong_questions))
+        )
+
+def start_wrong_challenge(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    current_user = User.get_by_id(user_id)
+    session = WrongChallengeSession(current_user)
+    session.initialize(count=5)
+
+    request.session['challenge_questions'] = [q.id for q in session.selected_questions]
+    request.session.modified = True
+
+    return render(request, 'wrong_challenge.html', {
+        'questions': session.selected_questions
+    })
+
+def submit_wrong_challenge(request):
+    user_id = request.session.get('user_id')
+    if not user_id or request.method != 'POST':
+        return redirect('login')
+
+    current_user = User.get_by_id(user_id)
+    question_ids = request.session.get('challenge_questions', [])
+    correct_count = 0
+
+    for qid in question_ids:
+        selected = request.POST.get(f'question_{qid}')
+        q = Question.get_by_id(qid)
+        if selected == q.answer:
+            correct_count += 1
+        else:
+            WrongQuestion.mark_as_wrong(current_user, q)
+
+    score = round((correct_count / len(question_ids)) * 100) if question_ids else 0
+
+    return render(request, 'challenge_result.html', {
+        'score': score,
+        'total': len(question_ids),
+        'correct': correct_count
+    })
