@@ -490,6 +490,33 @@ def grade_history_view(request):
     }
     return render(request, 'grade_history.html', context)
 
+# A1 題庫管理 首頁
+def manage_questions_index_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    
+    selected_topic = request.GET.get('topic', None)
+
+    current_user = User.get_by_id(user_id)
+    if not current_user:
+        request.session.pop('user_id', None)
+        return redirect('login')
+
+    question_list = Question.get_by_topic(
+        topic=selected_topic,
+        include_gpt='no'
+    )
+
+    topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
+
+    context = {
+        'all_questions': question_list,
+        'topics': topics,
+        'current_topic': selected_topic if selected_topic else 'all'
+    }
+    return render(request, 'manage_questions/index.html', context)
+    
 # A1 題庫管理 新增
 def manage_questions_create_view(request):
     user_id = request.session.get('user_id')
