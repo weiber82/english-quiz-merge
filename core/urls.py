@@ -27,6 +27,7 @@ urlpatterns = [
     path('manage-questions/create/', views.manage_questions_create_view, name='manage_questions_create'),
     path('manage-questions/edit/<int:question_id>/', views.manage_questions_edit_view, name='manage_questions_edit'),
     path('manage-questions/delete/<int:question_id>/', views.manage_questions_delete_view, name='manage_questions_delete'),
+
     path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
     path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
     path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),

@@ -566,9 +566,14 @@ def manage_questions_delete_view(request, question_id):
         messages.warning(request, "這筆資料不存在或已被刪除。")
     return redirect('manage_questions_index')
 
+
 class WrongChallengeSession:
     def __init__(self, user):
-        self.user = user。
+        self.user = user
+
+class WrongChallengeSession:
+    def __init__(self, user):
+        self.user = user
         self.selected_questions = []
 
     def initialize(self, count=5):
