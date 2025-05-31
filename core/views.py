@@ -579,7 +579,8 @@ def manage_questions_delete_view(request, question_id):
     if not user_id:
         return redirect('login')
     try:
-        question = Question.objects.get(id=question_id)
+        # question = Question.objects.get(id=question_id)
+        question = Question.get_by_id(question_id)
         question.delete()
         messages.success(request, "題目已成功刪除。")
     except Question.DoesNotExist:
