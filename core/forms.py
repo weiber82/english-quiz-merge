@@ -1,5 +1,5 @@
 from django import forms
-from .models import Question
+from .models import Question, User
 
 TOPIC_CHOICES = [
     ('vocab', '字彙'),
@@ -23,3 +23,19 @@ class QuestionForm(forms.ModelForm):
             'answer': forms.Select(choices=ANSWER_CHOICES, attrs={'class': 'form-control'}),
             'topic': forms.Select(choices=TOPIC_CHOICES, attrs={'class': 'form-control'}),  # ✅ 下拉式選單
         }
+
+class UserCreateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'role']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'password': forms.PasswordInput(attrs={'class': 'form-control'}),
+            'role': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if User.find_by_username(username):
+            raise forms.ValidationError("使用者名稱已存在")
+        return username

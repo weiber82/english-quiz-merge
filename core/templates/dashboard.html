@@ -23,6 +23,15 @@
 <body>
 
   <div class="container">
+    {% if messages %}
+      <div id="alert-container">
+        {% for message in messages %}
+          <div id="alertBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
     <div class="card shadow-sm">
       <div class="card-body">
         <h2 class="card-title mb-4 text-center">使用者主選單</h2>
@@ -43,7 +52,7 @@
         <h5 class="mt-4 text-success">🛠️ 系統管理功能（A 系列）</h5>
         <a href="{% url 'manage_questions_index' %}" class="btn btn-outline-dark w-100 btn-list">🧮 題庫管理（A1）</a>
         <a href="{% url 'import_excel_index' %}" class="btn btn-outline-dark w-100 btn-list">📤 Excel 題庫匯入（A2）</a>
-        <a href="#" class="btn btn-outline-dark w-100 btn-list">🔐 使用者權限管理（A3）</a>
+        <a href="{% url 'manage_users_index' %}" class="btn btn-outline-dark w-100 btn-list">🔐 使用者權限管理（A3）</a>
         <a href="#" class="btn btn-outline-dark w-100 btn-list">📊 測驗分析與報表下載（A4）</a>
         <a href="#" class="btn btn-outline-dark w-100 btn-list">🔍 題目品質查詢與回覆（A5）</a>
 
@@ -54,6 +63,18 @@
       </div>
     </div>
   </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // 自動在 1 秒後關閉 alert
+      setTimeout(function () {
+        $('#alertBox').alert('close');
+    }, 1000);
+    });
+  </script>
 
 </body>
 </html>
