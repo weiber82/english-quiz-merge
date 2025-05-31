@@ -51,6 +51,27 @@
         <hr>
 
         {# --- Topic 篩選區域 --- #}
+<<<<<<< HEAD
+        <div class="topic-filter mb-3">
+            <strong>篩選主題：</strong>
+            {% for topic_name in topics %}
+                <a href="{% url 'manage_questions_index' %}?topic={{ topic_name }}" class="btn btn-sm {% if current_topic == topic_name %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    {% if topic_name == 'vocab' %}
+                        字彙
+                    {% elif topic_name == 'grammar' %}
+                        文法
+                    {% elif topic_name == 'cloze' %}
+                        克漏字
+                    {% elif topic_name == 'reading' %}
+                        閱讀
+                    {% elif topic_name == 'all' %}
+                        全部
+                    {% else %}
+                    {% endif %}
+                </a>
+            {% endfor %}
+            <a href="{% url 'manage_questions_create' %}" class="btn btn-sm btn-danger">新增題目</a>
+=======
         <div class="topic-filter mb-3 d-flex justify-content-between flex-wrap align-items-center">
             <!-- 左側：篩選主題 -->
             <div class="d-flex align-items-center flex-wrap">
@@ -77,10 +98,13 @@
                    新增題目
                 </a>
             </div>
+>>>>>>> 3051b7973801a0a8472902160ab2a089aaba474d
         </div>
         {# --- Topic 篩選區域結束 --- #}
 
         {% if all_questions %}
+<<<<<<< HEAD
+=======
             {% if all_questions.has_other_pages %}
                 <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center mt-4">
@@ -114,13 +138,18 @@
                 </ul>
                 </nav>
             {% endif %}
+>>>>>>> 3051b7973801a0a8472902160ab2a089aaba474d
             <ul class="list-group list-group-flush" id="questionAccordion">
                 {% for q in all_questions %}
                 <div class="card mb-2">
                     <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ forloop.counter }}">
                         <button class="accordion-toggle-btn" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
                             aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+<<<<<<< HEAD
+                            題目 {{ forloop.counter }}
+=======
                             題目 {{ all_questions.start_index|add:forloop.counter0 }}
+>>>>>>> 3051b7973801a0a8472902160ab2a089aaba474d
                         </button>
                         <div class="d-flex align-items-center">
                             <a href="{% url 'manage_questions_edit' q.id %}" class="text-secondary mr-3" title="編輯">
@@ -130,7 +159,11 @@
                                 data-toggle="modal"
                                 data-target="#deleteModal"
                                 data-url="{% url 'manage_questions_delete' q.id %}"
+<<<<<<< HEAD
+                                data-title="題目 {{ forloop.counter }}">
+=======
                                 data-title="題目 {{ all_questions.start_index|add:forloop.counter0 }}">
+>>>>>>> 3051b7973801a0a8472902160ab2a089aaba474d
                                 <i class="bi bi-trash-fill"></i>
                             </a>
                         </div>

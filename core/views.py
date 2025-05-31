@@ -507,6 +507,11 @@ def manage_questions_index_view(request):
     if not current_user:
         request.session.pop('user_id', None)
         return redirect('login')
+
+    question_list = Question.get_by_topic(
+        topic=selected_topic,
+        include_gpt='no'
+    )
     
     if selected_topic == 'all' or not selected_topic:
         question_list = Question.get_all()
@@ -524,6 +529,7 @@ def manage_questions_index_view(request):
     topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
 
     context = {
+        'all_questions': question_list,
         'all_questions': page_obj,
         'topics': topics,
         'current_topic': selected_topic if selected_topic else 'all'
@@ -543,7 +549,8 @@ def manage_questions_create_view(request):
             return redirect('manage_questions_index')  # 你可以換成你要導向的頁面
     else:
         form = QuestionForm()
-    
+
+    return render(request, 'manage_questions/create.html', {'form': form})
     context = {
         'form': form
     }
@@ -565,6 +572,8 @@ def manage_questions_edit_view(request, question_id):
             return redirect('manage_questions_index')
     else:
         form = QuestionForm(instance=question)
+
+    return render(request, 'manage_questions/edit.html', {'form': form, 'question': question})
     
     context = {
         'form': form,
