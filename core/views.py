@@ -1,18 +1,23 @@
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
+from django.http import FileResponse
+from django.core.paginator import Paginator
 from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
 from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic
 from .forms import QuestionForm
 from dotenv import load_dotenv
+
 import json
 import random
 import os
 import uuid
+import openpyxl
 
 
 load_dotenv()  # 讀取 .env 檔案
@@ -490,7 +495,6 @@ def grade_history_view(request):
     }
     return render(request, 'grade_history.html', context)
 
-# feature/A1
 # A1 題庫管理 首頁
 def manage_questions_index_view(request):
     user_id = request.session.get('user_id')
@@ -503,21 +507,29 @@ def manage_questions_index_view(request):
     if not current_user:
         request.session.pop('user_id', None)
         return redirect('login')
-
-    question_list = Question.get_by_topic(
+    
+    if selected_topic == 'all' or not selected_topic:
+        question_list = Question.get_all()
+    else:
+        question_list = Question.get_by_topic(
         topic=selected_topic,
         include_gpt='no'
-    )
+        )
+    
+    paginator = Paginator(question_list, 10)  # 每頁 10 題
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
 
     topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
 
     context = {
-        'all_questions': question_list,
+        'all_questions': page_obj,
         'topics': topics,
         'current_topic': selected_topic if selected_topic else 'all'
     }
     return render(request, 'manage_questions/index.html', context)
-    
+
 # A1 題庫管理 新增
 def manage_questions_create_view(request):
     user_id = request.session.get('user_id')
@@ -531,8 +543,12 @@ def manage_questions_create_view(request):
             return redirect('manage_questions_index')  # 你可以換成你要導向的頁面
     else:
         form = QuestionForm()
+    
+    context = {
+        'form': form
+    }
 
-    return render(request, 'manage_questions/create.html', {'form': form})
+    return render(request, 'manage_questions/create.html', context)
 
 # A1 題庫管理 編輯
 def manage_questions_edit_view(request, question_id):
@@ -549,8 +565,13 @@ def manage_questions_edit_view(request, question_id):
             return redirect('manage_questions_index')
     else:
         form = QuestionForm(instance=question)
+    
+    context = {
+        'form': form,
+        'question': question
+    }
 
-    return render(request, 'manage_questions/edit.html', {'form': form, 'question': question})
+    return render(request, 'manage_questions/edit.html', context)
 
 # A1 題庫管理 刪除
 def manage_questions_delete_view(request, question_id):
@@ -564,7 +585,98 @@ def manage_questions_delete_view(request, question_id):
     except Question.DoesNotExist:
         messages.warning(request, "這筆資料不存在或已被刪除。")
     return redirect('manage_questions_index')
-=======
+
+
+# A2 Excel題庫匯入 首頁
+def import_excel_index_view(request):
+    preview_data = request.session.get('preview_questions', [])
+    paginator = Paginator(preview_data, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    error = request.session.pop('import_error', None)
+
+    context = {
+        'preview_questions': page_obj,
+        'error': error
+    }
+    return render(request, 'import_excel/index.html', context)
+
+# A2 Excel題庫匯入 下載檔案模板
+def import_excel_download_template_view(request):
+    file_path = os.path.join(settings.BASE_DIR, 'static', 'templates', 'template.xlsx')
+    return FileResponse(open(file_path, 'rb'), as_attachment=True, filename='template.xlsx')
+
+# A2 Excel題庫匯入 上傳檔案
+def import_excel_upload_file_view(request):
+    if request.method == 'POST' and request.FILES.getlist('excel_file'):
+        preview_data = request.session.get('preview_questions', [])
+
+        uploaded_files = request.FILES.getlist('excel_file')
+
+        expected = ['主題', '題目內容', '選項A', '選項B', '選項C', '選項D', '正確答案']
+
+        for file in uploaded_files:
+            try:
+                wb = openpyxl.load_workbook(file)
+                ws = wb.active
+
+                header = [cell.value for cell in ws[1]]
+                if header != expected:
+                    request.session['import_error'] = f'{file.name} 欄位格式錯誤，請使用模板上傳。'
+                    return redirect('import_excel_index')
+
+                for row in ws.iter_rows(min_row=2, values_only=True):
+                    topic, content, a, b, c, d, answer = row
+                    preview_data.append({
+                        'topic': topic,
+                        'content': content,
+                        'options': {'A': a, 'B': b, 'C': c, 'D': d},
+                        'answer': answer,
+                        'created_dt': '尚未儲存'
+                    })
+            except Exception as e:
+                request.session['import_error'] = f'{file.name} 檔案讀取錯誤：{str(e)}'
+                return redirect('import_excel_index')
+
+        # 更新 session
+        request.session['preview_questions'] = preview_data
+        return redirect('import_excel_index')
+
+    else:
+        request.session['import_error'] = '未收到檔案。'
+        return redirect('import_excel_index')
+
+# A2 Excel題庫匯入 取消預覽
+def import_excel_cancel_preview_view(request):
+    request.session.pop('preview_questions', None)
+    request.session['import_error'] = '已取消預覽匯入資料。'
+    return redirect('import_excel_index')
+
+# A2 Excel題庫匯入 匯入題庫
+def import_excel_confirm_save_view(request):
+    preview_data = request.session.get('preview_questions', [])
+
+    if not preview_data:
+        request.session['import_error'] = '找不到預覽資料，請重新上傳 Excel。'
+        return redirect('import_excel_index')
+
+    # 將題目存入資料庫
+    for q in preview_data:
+        try:
+            print(q)
+            Question.create_from_excel(q)
+        except Exception as e:
+            print('寫入失敗:', e)
+
+    # 清除 session，避免重複匯入
+    request.session.pop('preview_questions', None)
+
+    return redirect('import_excel_index')
+
+class WrongChallengeSession:
+    def __init__(self, user):
+        self.user = user
 
 class WrongChallengeSession:
     def __init__(self, user):
