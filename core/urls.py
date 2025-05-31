@@ -21,8 +21,16 @@ urlpatterns = [
     path('wrong-note/<int:fav_id>/', views.update_note_view, name='update_note'),
     path('favorites/', views.favorite_questions_view, name='favorite_questions'),
     path('wrong-questions/', views.wrong_questions_view, name='my_wrong_questions'),
+    
+    #--S5功能新增
+    path('wrong-question/mark-fixed/<int:wrong_question_id>/', views.mark_wrong_question_fixed_view, name='mark_wrong_question_fixed'),
+    
     path('diagnose-weakness/', views.diagnose_weakness_view, name='diagnose_weakness'),
     path('grade-history/', views.grade_history_view, name='grade_history'),
     path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
     path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
+    # --- S8 新增的 URL ---
+    path('feedback/submit/', views.submit_feedback_view, name='submit_feedback'),
+    path('my-feedback/', views.my_feedback_view, name='my_feedback'),
+    path('feedback/update/<int:feedback_id>/', views.update_feedback_view, name='update_feedback'),
 ]

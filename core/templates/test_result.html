@@ -1,42 +1,201 @@
-{% load custom_filters %}
+{% load custom_filters static %} {# ⭐ 確保載入 static 如果 JS 獨立出去 #}
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>測驗結果</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>測驗結果</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .star-rating-btn.selected {
+            color: orange;
+        }
+        .feedback-container {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-top: 10px; /* 與「回報問題」按鈕間隔 */
+            border-radius: 5px;
+            background-color: #f9f9f9; /* 稍微區分一下背景 */
+        }
+        .report-issue-btn { /* 為回報按鈕也加點間隔 */
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body class="container mt-5">
 
-  <h2 class="mb-4">測驗結果</h2>
+    <h2 class="mb-4">測驗結果</h2>
+    <p><strong>你答對了 {{ correct_count }} / {{ total }} 題，正確率為 {{ accuracy }}%</strong></p>
+    <hr>
 
-  <p><strong>你答對了 {{ correct_count }} / {{ total }} 題，正確率為 {{ accuracy }}%</strong></p>
+    <h5 class="mt-4">錯題清單</h5>
+    {% if wrong_records %}
+        <ul class="list-group">
+            {% for item in wrong_records %}
+                {% with record=item.record question_obj=item.record.question %}
+                    <li class="list-group-item">
+                        <p class="mb-1"><strong>Q{{ item.seq }}.</strong> {{ question_obj.content }}</p>
+                        <p>你選了: {{ record.selected_option }}. {{ question_obj.options|get_item:record.selected_option }}</p>
+                        <p>正確答案: {{ question_obj.answer }}. {{ question_obj.options|get_item:question_obj.answer }}</p>
+                        
+                        <a href="/gpt/?qid={{ question_obj.id }}" class="btn btn-sm btn-outline-info mb-2">查看 GPT 詳解與收藏</a>
+                        
+                        {# ⭐ 新增「回報問題」按鈕 #}
+                        <button type="button" class="btn btn-sm btn-outline-warning report-issue-btn mb-2" data-feedback-target="#feedback-{{ question_obj.id }}">回報此題問題</button>
 
-  <hr>
+                        {# S8 評價功能 HTML 結構 - 預設隱藏 #}
+                        <div class="feedback-container" id="feedback-{{ question_obj.id }}" data-question-id="{{ question_obj.id }}" style="display: none;">
+                            <h6>評價此題：</h6>
+                            <div class="rating-stars">
+                                <span>請評分 (1-5 星)：</span>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-rating-btn" data-rating="1">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-rating-btn" data-rating="2">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-rating-btn" data-rating="3">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-rating-btn" data-rating="4">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-rating-btn" data-rating="5">★</button>
+                                <span class="rating-text-feedback ms-2"></span>
+                                <input type="hidden" class="selected-rating" value="0">
+                            </div>
+                            <div class="comment-section mt-2">
+                                <label for="feedback-comment-input-{{ question_obj.id }}" class="form-label">您的評論 (選填)：</label>
+                                <textarea class="form-control feedback-comment" id="feedback-comment-input-{{ question_obj.id }}" rows="2"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm submit-feedback-btn mt-2">提交評價</button>
+                            <div class="feedback-message mt-1 small"></div>
+                        </div>
+                    </li>
+                {% endwith %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">找不到錯題，你很棒！</p>
+    {% endif %}
 
-  <h5 class="mt-4">錯題清單</h5>
-  {% if wrong_records %}
-    <ul class="list-group">
-      {% for item in wrong_records %}
-        {% with record=item.record %}
-          <li class="list-group-item">
-            <!-- 題目與詳解按鈕 -->
-            <p class="mb-1"><strong>Q{{ item.seq }}.</strong> {{ record.question.content }}</p>
-            <p>你選了: {{ record.selected_option }}. {{ record.question.options|get_item:record.selected_option }}</p>
-            <p>正確答案: {{ record.question.answer }}. {{ record.question.options|get_item:record.question.answer }}</p>
-            <a href="/gpt/?qid={{ record.question.id }}" class="btn btn-sm btn-outline-info">查看 GPT 詳解與收藏</a>
-          </li>
-        {% endwith %}
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p class="text-muted">找不到錯題，你很棒！</p>
-  {% endif %}
+    <div class="mt-4 mb-5">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">回儀表板</a>
+    </div>
 
-  <div class="mt-4">
-    <a href="/" class="btn btn-secondary">回首頁</a>
-  </div>
+    {% csrf_token %}
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // ⭐ 新增：處理「回報問題」按鈕的點擊事件
+        document.querySelectorAll('.report-issue-btn').forEach(reportButton => {
+            reportButton.addEventListener('click', function() {
+                const targetId = this.dataset.feedbackTarget; // 獲取目標評價區塊的 ID (例如 #feedback-123)
+                const feedbackContainer = document.querySelector(targetId);
+                
+                if (feedbackContainer) {
+                    if (feedbackContainer.style.display === 'none' || feedbackContainer.style.display === '') {
+                        feedbackContainer.style.display = 'block'; // 顯示評價區塊
+                        this.textContent = '隱藏評價區塊'; // 更新按鈕文字
+                    } else {
+                        feedbackContainer.style.display = 'none'; // 隱藏評價區塊
+                        this.textContent = '回報此題問題'; // 還原按鈕文字
+                    }
+                }
+            });
+        });
+
+        // 原有的處理所有評價區塊（星級、提交）的邏輯，現在只在評價區塊被顯示後才與使用者互動
+        document.querySelectorAll('.feedback-container').forEach(container => {
+            const questionId = container.dataset.questionId;
+            const starButtons = container.querySelectorAll('.star-rating-btn');
+            const selectedRatingInput = container.querySelector('.selected-rating');
+            const ratingTextFeedback = container.querySelector('.rating-text-feedback');
+            const commentTextarea = container.querySelector('.feedback-comment'); // ⭐ ID 已改為唯一的
+            const submitButton = container.querySelector('.submit-feedback-btn');
+            const messageDiv = container.querySelector('.feedback-message');
+
+            const ratingMap = { 1: "太簡單", 2: "太簡單", 3: "適中", 4: "太難", 5: "太難" };
+
+            starButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    selectedRatingInput.value = rating;
+                    
+                    // 更新同一組星級按鈕的狀態
+                    starButtons.forEach((btn) => {
+                        if (parseInt(btn.dataset.rating) <= rating) {
+                            btn.classList.add('selected', 'btn-warning');
+                            btn.classList.remove('btn-outline-secondary');
+                        } else {
+                            btn.classList.remove('selected', 'btn-warning');
+                            btn.classList.add('btn-outline-secondary');
+                        }
+                    });
+                    ratingTextFeedback.textContent = ratingMap[rating] || "";
+                });
+            });
+
+            submitButton.addEventListener('click', function() {
+                const rating = parseInt(selectedRatingInput.value);
+                const comment = commentTextarea.value.trim();
+
+                if (rating === 0) {
+                    messageDiv.textContent = '請先選擇星級評分！';
+                    messageDiv.style.color = 'red';
+                    setTimeout(() => { messageDiv.textContent = ''; }, 3000);
+                    return;
+                }
+
+                const dataToSend = {
+                    question_id: questionId,
+                    rating: rating,
+                    comment: comment
+                };
+
+                messageDiv.textContent = '提交中...';
+                messageDiv.style.color = 'blue';
+
+                fetch("{% url 'submit_feedback' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken 
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errData => {
+                            throw new Error(errData.message || `請求失敗，狀態碼：${response.status}`);
+                        }).catch(() => {
+                            throw new Error(`請求失敗，狀態碼：${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        messageDiv.textContent = data.message || '評價已提交！';
+                        messageDiv.style.color = 'green';
+                        submitButton.disabled = true; 
+                        submitButton.textContent = "已評價";
+                        // 可以選擇隱藏評價區塊或不清空內容，讓使用者看到自己剛提交的
+                        // container.style.display = 'none'; // 例如提交後自動隱藏
+                        // reportButton 對應的那個按鈕文字也應該改一下，如果還能找到它的話
+                        const correspondingReportButton = document.querySelector(`.report-issue-btn[data-feedback-target="#${container.id}"]`);
+                        if(correspondingReportButton) {
+                            correspondingReportButton.textContent = "已評價此題"; // 或其他提示
+                            correspondingReportButton.disabled = true; // 也可以禁用回報按鈕
+                        }
+
+                    } else {
+                        messageDiv.textContent = '錯誤：' + (data.message || '提交失敗，請稍後再試。');
+                        messageDiv.style.color = 'red';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting feedback:', error);
+                    messageDiv.textContent = '提交過程中發生錯誤：' + error.message;
+                    messageDiv.style.color = 'red';
+                });
+            });
+        });
+    });
+    </script>
 </body>
 </html>

@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import Min
 from django.utils import timezone
+from django.conf import settings
+from django.db.models import Avg
 import random
 
 class User(models.Model):
@@ -213,11 +215,100 @@ class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     rating = models.IntegerField()
-    comment = models.TextField(blank=True)
+    comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username} 對 Q{self.question.id} 的回饋"
+    
+    #S8
+    class Meta:
+        unique_together = ('user', 'question') # 每個使用者對同一題目只能有一筆評價
+
+    def __str__(self):
+        return f"{self.user.username} 對 Q{self.question.id} 的回饋: {self.rating} 星"
+
+    @classmethod
+    def add_or_update_feedback(cls, user_instance, question_instance, rating_value, comment_text=""):
+        """
+        新增或更新使用者對特定題目的評價。
+        """
+        if not (1 <= rating_value <= 5):
+            raise ValueError("評分必須介於 1 到 5 之間。")
+
+        feedback_obj, created = cls.objects.update_or_create(
+            user=user_instance,
+            question=question_instance,
+            defaults={'rating': rating_value, 'comment': comment_text}
+        )
+        return feedback_obj, created
+
+    @classmethod
+    def get_feedbacks_for_question(cls, question_instance):
+        """獲取特定題目的所有評價列表，按時間倒序"""
+        return cls.objects.filter(question=question_instance).order_by('-created_at')
+
+    @classmethod
+    def get_feedbacks_by_user(cls, user_instance):
+        """獲取特定使用者提交的所有評價列表，按時間倒序"""
+        return cls.objects.filter(user=user_instance).order_by('-created_at')
+
+    @classmethod
+    def get_average_rating_for_question(cls, question_instance):
+        """計算特定題目的平均評分"""
+        # 確保 question_instance 不是 None
+        if not question_instance:
+            return None
+        avg_rating = cls.objects.filter(question=question_instance).aggregate(Avg('rating'))['rating__avg']
+        return round(avg_rating, 2) if avg_rating is not None else None
+
+    @classmethod
+    def get_average_rating_for_question_id(cls, question_id):
+        """根據 question_id 計算特定題目的平均評分"""
+        avg_rating = cls.objects.filter(question_id=question_id).aggregate(Avg('rating'))['rating__avg']
+        return round(avg_rating, 2) if avg_rating is not None else None
+
+
+    @classmethod
+    def get_feedback_by_id_and_user(cls, feedback_id, user_instance):
+        try:
+            if not user_instance:
+                return None
+            return cls.objects.get(id=feedback_id, user=user_instance)
+        except cls.DoesNotExist:
+            return None
+
+    def update_details(self, new_rating, new_comment=""):
+        """更新此評價的評分和評論"""
+        if not (1 <= new_rating <= 5):
+            raise ValueError("評分必須介於 1 到 5 之間。")
+        self.rating = new_rating
+        self.comment = new_comment
+        self.save()
+        
+    # ⭐ 新增：獲取某使用者提交過評價的所有不重複主題 ⭐
+    @classmethod
+    def get_distinct_topics_for_user_feedback(cls, user_instance):
+        if not user_instance:
+            return []
+        return cls.objects.filter(user=user_instance)\
+                          .values_list('question__topic', flat=True)\
+                          .distinct()\
+                          .order_by('question__topic')
+
+    # ⭐ 修改：讓 get_feedbacks_by_user 可以接受 topic 參數 ⭐
+    @classmethod
+    def get_feedbacks_by_user(cls, user_instance, topic_name=None): 
+        """獲取特定使用者提交的所有評價列表，可選按主題篩選，按時間倒序"""
+        if not user_instance:
+            return cls.objects.none() # 回傳空的 QuerySet
+            
+        feedbacks_query = cls.objects.filter(user=user_instance)
+        if topic_name and topic_name.lower() != 'all': 
+            feedbacks_query = feedbacks_query.filter(question__topic=topic_name)
+        return feedbacks_query.select_related('question').order_by('-created_at') # 優化查詢
+
 
 
 class Favorite(models.Model):
@@ -279,50 +370,119 @@ class WrongQuestion(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.question.content[:50]}..."
 
-    # 原本的 get_or_create
+    # --- 原有方法，進行必要調整以符合新需求 ---
     @classmethod
     def get_or_create(cls, user, question, defaults=None):
-        return cls.objects.get_or_create(user=user, question=question, defaults=defaults)
+        if defaults is None:
+            defaults = {}
+        defaults.setdefault('is_fixed', False)
+        
+        obj, created = cls.objects.get_or_create(user=user, question=question, defaults=defaults)
+        if not created:
+            pass
+        elif created:
+             obj.last_wrong_time = timezone.now()
+             obj.save(update_fields=['last_wrong_time'])
+        return obj, created
 
-    # 原本的 save_wrong_question
     def save_wrong_question(self):
         self.save()
 
-    # 原本的 update_wrong_question_fields
     def update_wrong_question_fields(self, fields_to_update=None):
         self.save(update_fields=fields_to_update)
 
-    # 原本的 get_unconfirmed_by_user_and_topic
     @classmethod
     def get_unconfirmed_by_user_and_topic(cls, user, topic=None):
-        query = cls.objects.filter(user=user, confirmed=False)
-        if topic and topic != 'all':
+        """
+        獲取使用者待複習的錯題 (confirmed=False 且 is_fixed=False)，可按主題篩選。
+        這是 S5 錯題本主列表將使用的方法。
+        """
+        query = cls.objects.filter(user=user, confirmed=False, is_fixed=False)
+        if topic and topic.lower() != 'all':
             query = query.filter(question__topic=topic)
-        return query.order_by('-last_wrong_time')
+        return query.order_by('-last_wrong_time').select_related('question')
 
-    # 原本的 get_distinct_topics_for_unconfirmed_by_user
     @classmethod
     def get_distinct_topics_for_unconfirmed_by_user(cls, user):
-        return cls.objects.filter(user=user, confirmed=False) \
+        """獲取使用者待複習錯題中的不重複主題 (只考慮 is_fixed=False 的)"""
+        return cls.objects.filter(user=user, confirmed=False, is_fixed=False) \
                           .values_list('question__topic', flat=True) \
                           .distinct() \
                           .order_by('question__topic')
 
-    # 原本的 get_sample_for_weakness_analysis
     @classmethod
     def get_sample_for_weakness_analysis(cls, user, sample_count):
         all_user_wrong_questions = cls.objects.filter(user=user, confirmed=False)
-        actual_sample_count = min(len(all_user_wrong_questions), sample_count)
+        
+        available_count = all_user_wrong_questions.count()
+        actual_sample_count = min(available_count, sample_count)
+        
         if actual_sample_count > 0:
             return random.sample(list(all_user_wrong_questions), actual_sample_count)
         return []
     
     @classmethod
-    def get_unfixed_by_user(cls, user):
-        return cls.objects.filter(user=user, confirmed=False).select_related('question')
+    def get_unfixed_by_user(cls, user): # 這個方法名稱明確指明了 is_fixed=False
+        return cls.objects.filter(user=user, confirmed=False, is_fixed=False).select_related('question')
 
     @classmethod
     def mark_as_wrong(cls, user, question):
-        obj, _ = cls.objects.get_or_create(user=user, question=question)
-        obj.last_wrong_time = timezone.now()
-        obj.save()
+        """將題目標記為答錯，並重設其「已學會」狀態。"""
+        obj, created = cls.objects.get_or_create(
+            user=user, 
+            question=question,
+            defaults={
+                'last_wrong_time': timezone.now(),
+                'is_fixed': False,
+                'confirmed': False
+            }
+        )
+        if not created:
+            obj.last_wrong_time = timezone.now()
+            obj.is_fixed = False
+            obj.fixed_dt = None
+            obj.confirmed = False
+            obj.save(update_fields=['last_wrong_time', 'is_fixed', 'fixed_dt', 'confirmed'])
+        return obj
+
+    # 新增：將此錯題標記為「已學會」的實例方法
+    def mark_as_learned(self):
+        """將此 WrongQuestion 記錄標記為已學會 (is_fixed=True)，並記錄時間。"""
+        if not self.is_fixed:
+            self.is_fixed = True
+            self.fixed_dt = timezone.now()
+            self.save(update_fields=['is_fixed', 'fixed_dt', 'last_wrong_time'])
+            return True
+        return False
+    
+    @classmethod
+    def get_unconfirmed_by_user_and_topic(cls, user, topic=None):
+        query = cls.objects.filter(user=user, confirmed=False, is_fixed=False)
+        if topic and topic.lower() != 'all':
+            query = query.filter(question__topic=topic)
+        return query.order_by('-last_wrong_time').select_related('question')
+
+    @classmethod
+    def get_distinct_topics_for_unconfirmed_by_user(cls, user):
+        return cls.objects.filter(user=user, confirmed=False, is_fixed=False) \
+                        .values_list('question__topic', flat=True) \
+                        .distinct() \
+                        .order_by('question__topic')
+                        
+    @classmethod
+    def get_fixed_by_user_and_topic(cls, user, topic=None):
+        query = cls.objects.filter(user=user, is_fixed=True)
+        if topic and topic.lower() != 'all':
+            query = query.filter(question__topic=topic)
+        return query.order_by('-fixed_dt', '-last_wrong_time').select_related('question')
+
+    @classmethod
+    def get_distinct_topics_for_fixed_by_user(cls, user):
+        return cls.objects.filter(user=user, is_fixed=True) \
+                        .values_list('question__topic', flat=True) \
+                        .distinct() \
+                        .order_by('question__topic')
+                          
+
+        
+
