@@ -37,6 +37,15 @@ class User(models.Model):
     @classmethod
     def get_all(cls):
         return cls.objects.all()
+    
+    @classmethod
+    def delete_by_id(cls, user_id):
+        try:
+            user = cls.objects.get(id=user_id)
+            user.delete()
+            return True
+        except cls.DoesNotExist:
+            return False
 
 
 class Question(models.Model):
@@ -92,6 +101,16 @@ class Question(models.Model):
             topic=qdict['topic'],
             is_gpt_generated=include_gpt
         )
+    #
+    # 依 ID 刪除題目
+    @classmethod
+    def delete_by_id(cls, qid):
+        try:
+            q = cls.objects.get(id=qid)
+            q.delete()
+            return True
+        except cls.DoesNotExist:
+            return False
         
     
 class TestRecord(models.Model):

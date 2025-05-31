@@ -10,7 +10,7 @@ from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
 from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic
-from .forms import QuestionForm
+from .forms import QuestionForm, UserCreateForm
 from dotenv import load_dotenv
 
 import json
@@ -500,6 +500,10 @@ def manage_questions_index_view(request):
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
     
     selected_topic = request.GET.get('topic', None)
 
@@ -541,6 +545,10 @@ def manage_questions_create_view(request):
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
     
     if request.method == 'POST':
         form = QuestionForm(request.POST)
@@ -562,6 +570,15 @@ def manage_questions_edit_view(request, question_id):
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+    
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
 
     question = get_object_or_404(Question, id=question_id)
 
@@ -587,18 +604,32 @@ def manage_questions_delete_view(request, question_id):
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')
-    try:
-        # question = Question.objects.get(id=question_id)
-        question = Question.get_by_id(question_id)
-        question.delete()
-        messages.success(request, "題目已成功刪除。")
-    except Question.DoesNotExist:
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+    
+    success = Question.get_by_id(question_id)
+
+    if success:
+        Question.delete_by_id(question_id)
+        messages.success(request, "題目已成功刪除。") 
+    else:
         messages.warning(request, "這筆資料不存在或已被刪除。")
+    
     return redirect('manage_questions_index')
 
 
 # A2 Excel題庫匯入 首頁
 def import_excel_index_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
     preview_data = request.session.get('preview_questions', [])
     paginator = Paginator(preview_data, 10)
     page_number = request.GET.get('page')
@@ -614,11 +645,27 @@ def import_excel_index_view(request):
 
 # A2 Excel題庫匯入 下載檔案模板
 def import_excel_download_template_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
     file_path = os.path.join(settings.BASE_DIR, 'static', 'templates', 'template.xlsx')
     return FileResponse(open(file_path, 'rb'), as_attachment=True, filename='template.xlsx')
 
 # A2 Excel題庫匯入 上傳檔案
 def import_excel_upload_file_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
     if request.method == 'POST' and request.FILES.getlist('excel_file'):
         preview_data = request.session.get('preview_questions', [])
 
@@ -659,12 +706,28 @@ def import_excel_upload_file_view(request):
 
 # A2 Excel題庫匯入 取消預覽
 def import_excel_cancel_preview_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
     request.session.pop('preview_questions', None)
     request.session['import_error'] = '已取消預覽匯入資料。'
     return redirect('import_excel_index')
 
 # A2 Excel題庫匯入 匯入題庫
 def import_excel_confirm_save_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
     preview_data = request.session.get('preview_questions', [])
 
     if not preview_data:
@@ -674,7 +737,7 @@ def import_excel_confirm_save_view(request):
     # 將題目存入資料庫
     for q in preview_data:
         try:
-            print(q)
+            # print(q)
             Question.create_from_excel(q)
         except Exception as e:
             print('寫入失敗:', e)
@@ -683,6 +746,110 @@ def import_excel_confirm_save_view(request):
     request.session.pop('preview_questions', None)
 
     return redirect('import_excel_index')
+
+# A3 使用者權限管理 首頁
+def manage_users_index_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+    # print(current_user.role)
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
+    users = User.get_all()
+
+    paginator = Paginator(users, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'users': page_obj
+    }
+
+    return render(request, 'manage_users/index.html', context)
+
+# A3 使用者權限管理 新增
+def manage_users_create_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "使用者新增成功")
+            return redirect('manage_users_index')
+    else:
+        form = UserCreateForm()
+    
+    context = {
+        'form': form
+    }
+    return render(request, 'manage_users/create.html', context)
+
+# A3 使用者權限管理 編輯
+def manage_users_edit_view(request, u_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+
+    user_obj = User.get_by_id(u_id)
+    if not user_obj:
+        messages.warning(request, "找不到該使用者，無法編輯。")
+        return redirect('manage_users_index')
+
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST, instance=user_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '使用者更新成功。')
+            return redirect('manage_users_index')
+    else:
+        form = UserCreateForm(instance=user_obj)
+
+    return render(request, 'manage_users/edit.html', {
+        'form': form,
+        'user_obj': user_obj,
+    })
+
+# A3 使用者權限管理 刪除
+def manage_users_delete_view(request, u_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+    
+    if int(user_id) == int(u_id):
+        messages.warning(request, "無法刪除自己的帳號。")
+        return redirect('manage_users_index')
+
+    success = User.delete_by_id(u_id)
+    print("刪除回傳：", success)
+
+    if success:
+        messages.success(request, '使用者已刪除。')
+    else:
+        messages.warning(request, '找不到該使用者，無法刪除。')
+
+    return redirect('manage_users_index')
+
 
 class WrongChallengeSession:
     def __init__(self, user):

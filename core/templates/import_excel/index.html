@@ -68,6 +68,7 @@
             <h2>Excel 題庫匯入（A2）</h2>
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a>
         </div>
+        <hr>
         <form method="post" action="{% url 'import_excel_upload_file' %}" enctype="multipart/form-data" class="form-row align-items-start mb-4">
             {% csrf_token %}
           
@@ -149,7 +150,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ forloop.counter }}">
                     <button class="accordion-toggle-btn" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
                         aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
-                        題目 {{ preview_questions.start_index|add:forloop.counter0 }}
+                        題目 {{ preview_questions.start_index|add:forloop.counter0 }}：{{ q.content|truncatechars:30 }}
                     </button>
                     {% comment %} <div class="d-flex align-items-center">
                         <a href="{% url 'manage_questions_edit' q.id %}" class="text-secondary mr-3" title="編輯">
@@ -307,10 +308,10 @@
 
         }
 
-        // 自動在 3 秒後關閉 alert
+        // 自動在 2 秒後關閉 alert
         setTimeout(function () {
             $('#alertBox').alert('close');
-        }, 1000);
+        }, 2000);
     </script>
 </body>
 </html>
