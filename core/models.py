@@ -50,6 +50,16 @@ class Question(models.Model):
     def __str__(self):
         return self.content[:30]
 
+    
+    #  依指定排序取得全部題目清單
+    @classmethod
+    def get_all(cls, order_field='created_dt', order_direction='desc'):
+        # :param order_field: 欄位名稱（如 'created_dt', 'topic'）
+        # :param order_direction: 'asc' 升冪（預設），'desc' 降冪
+        if order_direction == 'desc':
+            order_field = f'-{order_field}'
+        return list(cls.objects.all().order_by(order_field))
+    
     #  依據 ID 取得單題（物件導向封裝）
     @classmethod
     def get_by_id(cls, qid):
@@ -57,7 +67,7 @@ class Question(models.Model):
             return cls.objects.get(id=qid)
         except cls.DoesNotExist:
             return None
-
+    
     #  依據主題與是否包含 GPT 題目取得題目清單
     @classmethod
     def get_by_topic(cls, topic, include_gpt):
@@ -70,6 +80,18 @@ class Question(models.Model):
     @classmethod
     def get_bulk_by_ids(cls, id_list):
         return cls.objects.filter(id__in=id_list) 
+        
+    
+    #  從 EXCEL 新增多筆題目
+    @classmethod
+    def create_from_excel(cls, qdict, include_gpt=False):
+        return cls.objects.create(
+            content=qdict['content'],
+            options=qdict['options'],
+            answer=qdict['answer'],
+            topic=qdict['topic'],
+            is_gpt_generated=include_gpt
+        )
         
     
 class TestRecord(models.Model):
