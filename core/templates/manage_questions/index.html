@@ -90,33 +90,40 @@
             {% if all_questions.has_other_pages %}
                 <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center mt-4">
+                
+                    {# 上一頁 #}
                     {% if all_questions.has_previous %}
                     <li class="page-item">
                         <a class="page-link" href="?topic={{ current_topic }}&page={{ all_questions.previous_page_number }}" aria-label="上一頁">
-                        <span aria-hidden="true">&laquo;</span>
+                            <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     {% else %}
                     <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                     {% endif %}
-
+                
+                    {# 動態控制頁碼範圍：目前頁 ± 2 #}
                     {% for num in all_questions.paginator.page_range %}
-                    {% if all_questions.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" href="?topic={{ current_topic }}&page={{ num }}">{{ num }}</a></li>
-                    {% endif %}
+                        {% if num >= all_questions.number|add:-2 and num <= all_questions.number|add:2 %}
+                            {% if all_questions.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?topic={{ current_topic }}&page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endif %}
                     {% endfor %}
-
+                
+                    {# 下一頁 #}
                     {% if all_questions.has_next %}
                     <li class="page-item">
                         <a class="page-link" href="?topic={{ current_topic }}&page={{ all_questions.next_page_number }}" aria-label="下一頁">
-                        <span aria-hidden="true">&raquo;</span>
+                            <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                     {% else %}
                     <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
                     {% endif %}
+                
                 </ul>
                 </nav>
             {% endif %}
@@ -173,39 +180,46 @@
                 
                       </div>
                     </div>
-                  </div>
+                </div>
                 {% endfor %}
             </ul>
             {% if all_questions.has_other_pages %}
                 <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center mt-4">
+                
+                    {# 上一頁 #}
                     {% if all_questions.has_previous %}
                     <li class="page-item">
                         <a class="page-link" href="?topic={{ current_topic }}&page={{ all_questions.previous_page_number }}" aria-label="上一頁">
-                        <span aria-hidden="true">&laquo;</span>
+                            <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     {% else %}
                     <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                     {% endif %}
-
+                
+                    {# 動態控制頁碼範圍：目前頁 ± 2 #}
                     {% for num in all_questions.paginator.page_range %}
-                    {% if all_questions.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" href="?topic={{ current_topic }}&page={{ num }}">{{ num }}</a></li>
-                    {% endif %}
+                        {% if num >= all_questions.number|add:-2 and num <= all_questions.number|add:2 %}
+                            {% if all_questions.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?topic={{ current_topic }}&page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endif %}
                     {% endfor %}
-
+                
+                    {# 下一頁 #}
                     {% if all_questions.has_next %}
                     <li class="page-item">
                         <a class="page-link" href="?topic={{ current_topic }}&page={{ all_questions.next_page_number }}" aria-label="下一頁">
-                        <span aria-hidden="true">&raquo;</span>
+                            <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                     {% else %}
                     <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
                     {% endif %}
+                
                 </ul>
                 </nav>
             {% endif %}
@@ -254,6 +268,8 @@
             </div>
         </div>
     </div>
+    <footer class="bg-light text-center text-muted py-3">
+    </footer>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

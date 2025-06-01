@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Min
+from django.db.models import Min, Count, Q, F
 from django.utils import timezone
 from django.conf import settings
 from django.db.models import Avg
@@ -81,7 +81,7 @@ class Question(models.Model):
     
     #  依據主題與是否包含 GPT 題目取得題目清單
     @classmethod
-    def get_by_topic(cls, topic, include_gpt):
+    def get_by_topic(cls, topic, include_gpt=True):
         qs = cls.objects.filter(topic=topic)
         if include_gpt == 'no':
             qs = qs.filter(is_gpt_generated=False)
@@ -103,7 +103,7 @@ class Question(models.Model):
             topic=qdict['topic'],
             is_gpt_generated=include_gpt
         )
-    #
+
     # 依 ID 刪除題目
     @classmethod
     def delete_by_id(cls, qid):
@@ -113,6 +113,7 @@ class Question(models.Model):
             return True
         except cls.DoesNotExist:
             return False
+<<<<<<< HEAD
         
 
     @classmethod
@@ -128,6 +129,19 @@ class Question(models.Model):
             is_gpt_generated=True
         )
         
+=======
+    
+    # 統計每個題型的題目數量
+    @classmethod
+    def get_topic_distribution(cls):
+        data = (
+            cls.objects
+            .values('topic')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+        return [{'topic': item['topic'], 'count': item['count']} for item in data]
+>>>>>>> 5a42846 (完成部分A3功能：圓餅圖、選項分析))
     
 class TestRecord(models.Model):
     test_result_id = models.CharField(max_length=64) 
@@ -227,6 +241,59 @@ class TestRecord(models.Model):
             })
 
         return test_history_details
+    
+    # 計算各個題型的平均正確率
+    @classmethod
+    def get_topic_accuracy(cls):
+        data = (
+            cls.objects
+            .values(topic=F('question__topic'))
+            .annotate(
+                total=Count('id'),
+                correct=Count('id', filter=Q(is_correct=True))
+            )
+            .order_by('topic')
+        )
+        return [
+            {
+                'topic': item['topic'],
+                'accuracy': round(item['correct'] / item['total'] * 100, 2) if item['total'] else 0
+            }
+            for item in data
+        ]
+
+    # 根據 Question.id 取得所有作答記錄
+    @classmethod
+    def get_records_by_question_id(cls, qid):
+        return cls.objects.filter(question_id=qid)
+    
+    # 根據 Question.id 取得選項分析數據(被選次數、被選比率、通過率、該題測驗總數)
+    @classmethod
+    def get_question_stats(cls, question_id):
+        records = cls.objects.filter(question_id=question_id)
+        total_records = records.count()
+        correct_count = records.filter(is_correct=True).count()
+
+        # 各選項被選次數
+        option_stats = {opt: 0 for opt in ['A', 'B', 'C', 'D']}
+        for r in records:
+            if r.selected_option in option_stats:
+                option_stats[r.selected_option] += 1
+
+        # 各選項被選機率 (%)
+        option_ratio = {}
+        for opt, count in option_stats.items():
+            option_ratio[opt] = round((count / total_records) * 100, 1) if total_records > 0 else 0.0
+
+        # 通過率 (%)
+        pass_rate = round((correct_count / total_records) * 100, 1) if total_records > 0 else 0.0
+
+        return {
+            'stats': option_stats,
+            'ratio': option_ratio,
+            'pass_rate': pass_rate,
+            'total': total_records
+        }
     
 
 class WeakTopic(models.Model):

@@ -51,8 +51,8 @@
         <a href="{% url 'manage_questions_index' %}" class="btn btn-outline-dark w-100 btn-list">🧮 題庫管理（A1）</a>
         <a href="{% url 'import_excel_index' %}" class="btn btn-outline-dark w-100 btn-list">📤 Excel 題庫匯入（A2）</a>
         <a href="{% url 'manage_users_index' %}" class="btn btn-outline-dark w-100 btn-list">🔐 使用者權限管理（A3）</a>
-        <a href="#" class="btn btn-outline-dark w-100 btn-list">📊 測驗分析與報表下載（A4）</a>
-        <a href="#" class="btn btn-outline-dark w-100 btn-list">🔍 題目品質查詢與回覆（A5）</a>
+        <a href="{% url 'analysis_index_view' %}" class="btn btn-outline-dark w-100 btn-list">📊 測驗分析與報表下載（A4）</a>
+        <a href="{% url 'quality_index_view' %}" class="btn btn-outline-dark w-100 btn-list">🔍 題目品質查詢與回覆（A5）</a>
 
         <div class="mt-4 text-center">
           <a href="{% url 'logout' %}" class="btn btn-danger w-100">🚪 登出</a>

@@ -5,6 +5,9 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFoun
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.http import FileResponse
+from django.core.paginator import Paginator
+from django.db.models import Count, Q, F
 from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
@@ -818,6 +821,7 @@ def import_excel_confirm_save_view(request):
 
     return redirect('import_excel_index')
 
+
 # A3 使用者權限管理 首頁
 def manage_users_index_view(request):
     user_id = request.session.get('user_id')
@@ -920,6 +924,130 @@ def manage_users_delete_view(request, u_id):
         messages.warning(request, '找不到該使用者，無法刪除。')
 
     return redirect('manage_users_index')
+
+
+# A4 測驗分析與報表下載 首頁
+def analysis_index_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+    
+    if request.method == 'GET' and 'topic' not in request.GET and 'qid' not in request.GET:
+        topic_dist = Question.get_topic_distribution()
+        topic_acc = TestRecord.get_topic_accuracy()
+
+        accuracy_map = {item['topic']: item['accuracy'] for item in topic_acc}
+
+        for item in topic_dist:
+            topic = item['topic']
+            item['accuracy'] = accuracy_map.get(topic, 0)
+
+        context = {
+            'topic_distribution': topic_dist,
+        }
+        return render(request, 'analysis/index.html', context)
+    if 'topic' in request.GET:
+        topic = request.GET.get('topic')
+        if topic == 'all':
+            questions = Question.get_all()
+        else:
+            questions = Question.get_by_topic(topic)
+        topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
+        
+        paginator = Paginator(questions, 10)  # 每頁 10 題
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'questions': page_obj,
+            'topics': topics,
+            'current_topic': topic
+        }
+
+        return render(request, 'analysis/topic_question_list.html', context)
+
+    # --- Case C: 題目選項統計圖 (AJAX) ---
+    if 'qid' in request.GET:
+        qid = request.GET.get('qid')
+        question = Question.get_by_id(qid)
+        stats = TestRecord.get_question_stats(qid)
+
+        response_data = {
+            'stats': stats['stats'],
+            'ratio': stats['ratio'],
+            'pass_rate': stats['pass_rate'],
+            'total': stats['total'],
+            'answer': question.answer if question else None
+        }
+
+        return JsonResponse(response_data)
+
+
+# A5 題目品質查詢與回覆 首頁
+def quality_index_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+    current_user = User.get_by_id(user_id)
+
+    if not current_user or current_user.role != 'admin':
+        messages.warning(request, "您沒有權限瀏覽此頁面。")
+        return redirect('dashboard')
+    
+    if request.method == 'GET' and 'topic' not in request.GET and 'qid' not in request.GET:
+        topic_dist = Question.get_topic_distribution()
+        topic_acc = TestRecord.get_topic_accuracy()
+
+        accuracy_map = {item['topic']: item['accuracy'] for item in topic_acc}
+
+        for item in topic_dist:
+            topic = item['topic']
+            item['accuracy'] = accuracy_map.get(topic, 0)
+
+        context = {
+            'topic_distribution': topic_dist,
+        }
+        return render(request, 'analysis/index.html', context)
+    if 'topic' in request.GET:
+        topic = request.GET.get('topic')
+        if topic == 'all':
+            questions = Question.get_all()
+        else:
+            questions = Question.get_by_topic(topic)
+        topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
+        
+        paginator = Paginator(questions, 10)  # 每頁 10 題
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'questions': page_obj,
+            'topics': topics,
+            'current_topic': topic
+        }
+
+        return render(request, 'analysis/topic_question_list.html', context)
+
+    # --- Case C: 題目選項統計圖 (AJAX) ---
+    if 'qid' in request.GET:
+        qid = request.GET.get('qid')
+        question = Question.get_by_id(qid)
+        stats = TestRecord.get_question_stats(qid)
+
+        response_data = {
+            'stats': stats['stats'],
+            'ratio': stats['ratio'],
+            'pass_rate': stats['pass_rate'],
+            'total': stats['total'],
+            'answer': question.answer if question else None
+        }
+
+        return JsonResponse(response_data)
 
 
 class WrongChallengeSession:
