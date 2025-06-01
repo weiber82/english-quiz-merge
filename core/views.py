@@ -1,18 +1,17 @@
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, JsonResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse
-from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
 from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
-from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic
+from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic, Feedback, User
+from django.core.paginator import Paginator
 from .forms import QuestionForm
 from dotenv import load_dotenv
-
 import json
 import random
 import os
@@ -387,30 +386,82 @@ def toggle_favorite_view(request, question_id):
 def wrong_questions_view(request):
     user_id = request.session.get('user_id')
     if not user_id:
+        # messages.error(request, "請先登入以查看錯題本。")
         return redirect('login')
-
-    selected_topic = request.GET.get('topic', None)
 
     current_user = User.get_by_id(user_id)
     if not current_user:
         request.session.pop('user_id', None)
+        # messages.error(request, "使用者資訊錯誤，請重新登入。")
         return redirect('login')
 
-    wrong_list = WrongQuestion.get_unconfirmed_by_user_and_topic(
-        user=current_user, 
-        topic=selected_topic
-    )
+    selected_topic = request.GET.get('topic', None)
+    # 獲取 view_mode 參數，預設為 'unfixed' (未學會)
+    view_mode = request.GET.get('view_mode', 'unfixed') 
 
-    available_topics = WrongQuestion.get_distinct_topics_for_unconfirmed_by_user(
-        user=current_user
-    )
+    page_title_base = "我的錯題本 (S5 功能)"
+
+    if view_mode == 'fixed':
+        # 呼叫獲取「已學會」錯題的方法
+        wrong_list = WrongQuestion.get_fixed_by_user_and_topic(
+            user=current_user, 
+            topic=selected_topic
+        )
+        # 獲取「已學會」錯題的主題列表
+        available_topics = WrongQuestion.get_distinct_topics_for_fixed_by_user(
+            user=current_user
+        )
+        page_title = f"{page_title_base} - 已學會的題目"
+    else:
+        # 呼叫獲取「未學會」錯題的方法
+        wrong_list = WrongQuestion.get_unconfirmed_by_user_and_topic(
+            user=current_user, 
+            topic=selected_topic
+        )
+        # 獲取「未學會」錯題的主題列表
+        available_topics = WrongQuestion.get_distinct_topics_for_unconfirmed_by_user(
+            user=current_user
+        )
+        page_title = f"{page_title_base} - 待複習的題目"
+        view_mode = 'unfixed'
 
     context = {
         'wrong_questions': wrong_list,
         'available_topics': available_topics,
-        'current_topic': selected_topic if selected_topic else 'all'
+        'current_topic': selected_topic if selected_topic else 'all',
+        'current_view_mode': view_mode,
+        'page_title': page_title
     }
     return render(request, 'wrong_questions.html', context)
+
+
+@login_required
+@require_POST # 標記為已學會是一個修改操作，用 POST
+def mark_wrong_question_fixed_view(request, wrong_question_id):
+    user_id_from_session = request.session.get('user_id')
+    current_user = User.get_by_id(user_id_from_session)
+
+    if not current_user:
+        return JsonResponse({'status': 'error', 'message': '使用者未登入或 Session 已過期。'}, status=401)
+
+    try:
+        # 直接查詢，並確保是屬於當前使用者的錯題
+        wrong_question_entry = WrongQuestion.objects.get(id=wrong_question_id, user=current_user)
+
+        # 呼叫在 WrongQuestion 模型中定義的 mark_as_learned (或類似名稱) 方法
+        changed = wrong_question_entry.mark_as_learned() # 假設方法名是 mark_as_learned
+
+        if changed:
+            return JsonResponse({'status': 'success', 'message': '題目已成功標記為已學會。'})
+        else:
+            return JsonResponse({'status': 'info', 'message': '題目先前已被標記為已學會。'})
+
+    except WrongQuestion.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': '找不到該錯題記錄或您沒有權限操作。'}, status=404)
+    except Exception as e:
+        # 實際部署時應使用 logging 模組
+        print(f"Error in mark_wrong_question_fixed_view (wq_id: {wrong_question_id}): {type(e).__name__} - {e}")
+        return JsonResponse({'status': 'error', 'message': '標記已學會時發生錯誤。'}, status=500)
 
 
 def diagnose_weakness_view(request):
@@ -730,3 +781,160 @@ def submit_wrong_challenge(request):
         'total': len(question_ids),
         'correct': correct_count
     })
+
+
+# --- S8 新增的視圖函式 ---
+@login_required 
+@require_POST 
+def submit_feedback_view(request):
+    try:
+        # 判斷請求內容類型
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+            question_id_str = data.get('question_id')
+            rating_str = data.get('rating')
+            comment = data.get('comment', '')
+        else:
+            question_id_str = request.POST.get('question_id')
+            rating_str = request.POST.get('rating')
+            comment = request.POST.get('comment', '')
+
+        # 基本的資料驗證
+        if not question_id_str or not rating_str:
+            return JsonResponse({'status': 'error', 'message': '缺少題目ID或評分。'}, status=400)
+
+        try:
+            question_id = int(question_id_str)
+            rating = int(rating_str)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': '題目ID或評分必須是有效的數字。'}, status=400)
+
+        # --- 使用模型方法進行資料存取 ---
+        user_id_from_session = request.session.get('user_id')
+        if not user_id_from_session:
+            return JsonResponse({'status': 'error', 'message': '使用者未登入或 Session 已過期。'}, status=401)
+        
+        # 透過 User 模型的類別方法獲取使用者實例
+        user_instance = User.get_by_id(user_id_from_session)
+        if not user_instance:
+            return JsonResponse({'status': 'error', 'message': '找不到使用者資訊 (ID: {}).'.format(user_id_from_session)}, status=404)
+
+        # 透過 Question 模型的類別方法獲取題目實例
+        question_instance = Question.get_by_id(question_id)
+        if not question_instance:
+            return JsonResponse({'status': 'error', 'message': '找不到指定的題目 (ID: {}).'.format(question_id)}, status=404)
+        
+        # 呼叫 Feedback 模型的類別方法來新增或更新評價
+        feedback_obj, created = Feedback.add_or_update_feedback(
+            user_instance=user_instance,
+            question_instance=question_instance,
+            rating_value=rating,
+            comment_text=comment
+        )
+        # --- 資料存取結束 ---
+
+        message = '評價已成功更新！' if not created else '評價已成功提交！'
+        # 可以回傳 feedback_obj 的更多資訊，如果前端需要的話
+        return JsonResponse({
+            'status': 'success', 
+            'message': message, 
+            'feedback_id': feedback_obj.id,
+            'created': created 
+        })
+
+    except ValueError as ve: 
+        return JsonResponse({'status': 'error', 'message': str(ve)}, status=400)
+    except json.JSONDecodeError: 
+        return JsonResponse({'status': 'error', 'message': '無效的 JSON 格式。'}, status=400)
+    except Exception as e:
+        print(f"內部錯誤 in submit_feedback_view: {type(e).__name__} - {e}") # 暫時用 print 偵錯
+        return JsonResponse({'status': 'error', 'message': '提交評價時發生未預期的伺服器錯誤。'}, status=500)
+    
+    
+@login_required
+def my_feedback_view(request):
+    user_id_from_session = request.session.get('user_id')
+    current_user = User.get_by_id(user_id_from_session)
+
+    if not current_user:
+        messages.error(request, "請先登入以查看您的評價。")
+        return redirect('login')
+
+    # 獲取前端選擇的篩選主題 (從 GET 請求參數)
+    selected_topic = request.GET.get('topic', None)
+
+    # 根據選擇的主題篩選評價
+    if selected_topic and selected_topic.lower() == 'all':
+        user_feedbacks = Feedback.get_feedbacks_by_user(user_instance=current_user)
+    else:
+        user_feedbacks = Feedback.get_feedbacks_by_user(user_instance=current_user, topic_name=selected_topic)
+    
+    # 獲取該使用者評價過的所有不重複主題，用於生成篩選按鈕
+    available_topics = Feedback.get_distinct_topics_for_user_feedback(user_instance=current_user)
+
+    context = {
+        'feedbacks': user_feedbacks,
+        'page_title': '我提交的評價',
+        'available_topics': available_topics, 
+        'current_topic': selected_topic if selected_topic else 'all' 
+    }
+    return render(request, 'my_feedback.html', context)
+
+
+@login_required
+@require_POST 
+def update_feedback_view(request, feedback_id): # 
+    try:
+        user_id_from_session = request.session.get('user_id')
+        current_user = User.get_by_id(user_id_from_session)
+        if not current_user:
+            return JsonResponse({'status': 'error', 'message': '使用者未登入或 Session 已過期。'}, status=401)
+
+        # 使用 Feedback 模型的方法獲取屬於該使用者的特定評價記錄
+        feedback_to_update = Feedback.get_feedback_by_id_and_user(feedback_id, current_user)
+
+        if not feedback_to_update:
+            return JsonResponse({'status': 'error', 'message': '找不到該評價記錄或您沒有權限編輯此評價。'}, status=404)
+
+        # 從請求中獲取新的評分和評論
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+            new_rating_str = data.get('rating')
+            new_comment = data.get('comment', feedback_to_update.comment if feedback_to_update.comment is not None else "") 
+        else:
+            new_rating_str = request.POST.get('rating')
+            new_comment = request.POST.get('comment', feedback_to_update.comment if feedback_to_update.comment is not None else "")
+
+        if not new_rating_str:
+            return JsonResponse({'status': 'error', 'message': '缺少評分資訊。'}, status=400)
+        
+        try:
+            new_rating = int(new_rating_str)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': '評分必須是有效的數字。'}, status=400)
+
+        # 呼叫 Feedback 實例的 update_details 方法來更新評價
+        feedback_to_update.update_details(new_rating=new_rating, new_comment=new_comment)
+        
+        # 準備回傳給前端的更新後 feedback 資料
+        updated_feedback_data = {
+            'id': feedback_to_update.id,
+            'rating': feedback_to_update.rating,
+            'comment': feedback_to_update.comment,
+            'question_content': feedback_to_update.question.content[:30] + "..." if feedback_to_update.question else "N/A",
+            'updated_at': feedback_to_update.updated_at.strftime("%Y-%m-%d %H:%M")
+        }
+        
+        return JsonResponse({
+            'status': 'success', 
+            'message': '評價已成功更新！',
+            'feedback': updated_feedback_data
+        })
+
+    except ValueError as ve: 
+        return JsonResponse({'status': 'error', 'message': str(ve)}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': '無效的 JSON 格式。'}, status=400)
+    except Exception as e:
+        print(f"內部錯誤 in update_feedback_view (feedback_id: {feedback_id}): {type(e).__name__} - {e}") #用 print 偵錯
+        return JsonResponse({'status': 'error', 'message': '更新評價時發生未預期的伺服器錯誤。'}, status=500)
