@@ -1,0 +1,334 @@
+{% comment %} core/templates/my_feedback.html (包含原地編輯功能) {% endcomment %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title|default:"我提交的評價" }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { 
+            padding-top: 20px; 
+            padding-bottom: 20px; 
+            background-color: #f8f9fa;
+        }
+        .container { 
+            max-width: 960px; 
+            background-color: #fff; 
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+        }
+        .list-group-item p { margin-bottom: 0.5rem; }
+        .list-group-item strong { color: #343a40; }
+        
+        /* 星級按鈕樣式 */
+        .star-rating-btn.selected, .star-edit-btn.selected { 
+            color: orange !important; /* 強制覆蓋 Bootstrap outline 樣式 */
+            border-color: orange !important;
+        }
+        .star-rating-btn, .star-edit-btn {
+             /* 如果需要，可以調整按鈕的預設樣式 */
+        }
+
+        /* 編輯表單樣式 */
+        .edit-feedback-form {
+            border: 1px dashed #ccc;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            background-color: #f0f0f0; /* 稍微不同的背景以區分 */
+        }
+
+        /* 主題篩選按鈕的樣式 */
+        .topic-filters a.btn { 
+            margin-right: 5px; 
+            margin-bottom: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>{{ page_title|default:"我提交的評價" }}</h2>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回儀表板</a>
+        </div>
+        <hr>
+
+        {# ⭐ 主題篩選按鈕區塊 ⭐ #}
+        <div class="topic-filters mb-3" style="margin-top: 1rem;"> {# 為篩選區塊也加上一點上方間距 #}
+            <span>篩選主題：</span>
+            <a href="{% url 'my_feedback' %}?topic=all" 
+               class="btn btn-sm {% if current_topic == 'all' or not current_topic %}btn-primary{% else %}btn-outline-primary{% endif %}">
+               全部評價
+            </a>
+            {% for topic_name in available_topics %}
+                <a href="{% url 'my_feedback' %}?topic={{ topic_name }}" 
+                   class="btn btn-sm {% if current_topic == topic_name %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                   {{ topic_name|capfirst }} {# 將主題名稱首字母大寫 #}
+                </a>
+            {% endfor %}
+        </div>
+        {# ⭐ 主題篩選按鈕區塊結束 ⭐ #}
+
+        {% if feedbacks %}
+            <p>您已提交的評價記錄：</p>
+            <ul class="list-group">
+                {% for feedback_item in feedbacks %}
+                    <li class="list-group-item mb-3" id="feedback-item-{{ feedback_item.id }}">
+                        {# --- 靜態顯示評價內容 --- #}
+                        <div class="feedback-display">
+                            <p><strong>題目：</strong> {{ feedback_item.question.content|truncatewords:30 }} 
+                                <a href="{% url 'gpt_detail' %}?qid={{ feedback_item.question.id }}" class="btn btn-sm btn-outline-info ms-2">查看題目詳情</a>
+                            </p>
+                            <p><strong>您的評分：</strong> 
+                                {% for i in "12345"|make_list %}
+                                    {% if i|add:0 <= feedback_item.rating %}
+                                        <span style="color: orange;" class="display-rating-star">★</span>
+                                    {% else %}
+                                        <span style="color: lightgray;" class="display-rating-star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                                (<span class="display-rating-value">{{ feedback_item.rating }}</span> 星
+                                <span class="display-rating-text">
+                                    {# ⭐ 這裡根據您期望的 1星太簡單, 5星太難 來顯示 #}
+                                    {% if feedback_item.rating == 1 %} - 太簡單 
+                                    {% elif feedback_item.rating == 2 %} - 偏簡單
+                                    {% elif feedback_item.rating == 3 %} - 適中
+                                    {% elif feedback_item.rating == 4 %} - 偏難
+                                    {% elif feedback_item.rating == 5 %} - 太難
+                                    {% endif %}
+                                </span>)
+                            </p>
+                            <p><strong>您的評論：</strong> <span class="display-comment">{% if feedback_item.comment %}{{ feedback_item.comment }}{% else %}<i class="text-muted">(無評論)</i>{% endif %}</span></p>
+                            <small class="text-muted display-updated-at">最後更新：{{ feedback_item.updated_at|date:"Y-m-d H:i" }}</small>
+                            
+                            {# ⭐ 編輯評價按鈕 ⭐ #}
+                            <button type="button" class="btn btn-sm btn-outline-primary ms-2 edit-feedback-btn" 
+                                    data-feedback-id="{{ feedback_item.id }}"
+                                    data-current-rating="{{ feedback_item.rating }}"
+                                    data-current-comment="{{ feedback_item.comment|default_if_none:'' }}">編輯評價</button>
+                        </div>
+
+                        {# --- 編輯評價的表單 (預設隱藏) --- #}
+                        <div class="edit-feedback-form mt-3" style="display: none;">
+                            <h6>編輯您的評價：</h6>
+                            <div class="rating-stars-edit mb-2">
+                                <span>新評分 (1-5 星)：</span>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-edit-btn" data-rating="1">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-edit-btn" data-rating="2">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-edit-btn" data-rating="3">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-edit-btn" data-rating="4">★</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm star-edit-btn" data-rating="5">★</button>
+                                <span class="rating-text-edit-feedback ms-2"></span>
+                                <input type="hidden" class="selected-edit-rating" value="0"> {# 用來儲存編輯時選擇的星級 #}
+                            </div>
+                            <div class="comment-section-edit mb-2">
+                                <label for="edit-comment-{{ feedback_item.id }}" class="form-label">新評論 (選填)：</label>
+                                <textarea class="form-control edit-comment-textarea" id="edit-comment-{{ feedback_item.id }}" rows="2"></textarea>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm save-feedback-btn">儲存變更</button>
+                            <button type="button" class="btn btn-secondary btn-sm cancel-edit-btn ms-2">取消</button>
+                            <div class="edit-feedback-message mt-1 small"></div> {# 用於顯示儲存時的訊息 #}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info mt-3" role="alert">
+                您目前還沒有提交任何評價。
+            </div>
+        {% endif %}
+    </div>
+
+    {% csrf_token %} {# CSRF token for AJAX POST #}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const ratingMap = { 
+            1: "太簡單", 
+            2: "偏簡單", 
+            3: "適中", 
+            4: "偏難", 
+            5: "太難" 
+        };
+
+        // 處理「編輯評價」按鈕點擊
+        document.querySelectorAll('.edit-feedback-btn').forEach(editButton => {
+            editButton.addEventListener('click', function () {
+                const feedbackItemLi = this.closest('li.list-group-item'); // 找到包含這整個評價的 <li>
+                const displayDiv = feedbackItemLi.querySelector('.feedback-display');
+                const editFormDiv = feedbackItemLi.querySelector('.edit-feedback-form');
+                
+                const currentRating = parseInt(this.dataset.currentRating);
+                const currentComment = this.dataset.currentComment;
+
+                // 填充編輯表單的現有值
+                const selectedEditRatingInput = editFormDiv.querySelector('.selected-edit-rating');
+                const editStarButtons = editFormDiv.querySelectorAll('.star-edit-btn');
+                const editTextFeedback = editFormDiv.querySelector('.rating-text-edit-feedback');
+                
+                selectedEditRatingInput.value = currentRating; // 設定隱藏 input 的值
+                editStarButtons.forEach(btn => { // 設定星星按鈕的初始選中樣式
+                    const btnRating = parseInt(btn.dataset.rating);
+                    if (btnRating <= currentRating) {
+                        btn.classList.add('selected', 'btn-warning');
+                        btn.classList.remove('btn-outline-secondary');
+                    } else {
+                        btn.classList.remove('selected', 'btn-warning');
+                        btn.classList.add('btn-outline-secondary');
+                    }
+                });
+                editTextFeedback.textContent = ratingMap[currentRating] || ""; // 設定初始文字描述
+                editFormDiv.querySelector('.edit-comment-textarea').value = currentComment; // 設定評論
+                
+                editFormDiv.querySelector('.edit-feedback-message').textContent = ''; // 清除舊訊息
+
+                // 切換顯示：隱藏靜態顯示，顯示編輯表單
+                displayDiv.style.display = 'none';
+                editFormDiv.style.display = 'block';
+            });
+        });
+
+        // 處理「取消」編輯按鈕點擊
+        document.querySelectorAll('.cancel-edit-btn').forEach(cancelButton => {
+            cancelButton.addEventListener('click', function () {
+                const feedbackItemLi = this.closest('li.list-group-item');
+                const displayDiv = feedbackItemLi.querySelector('.feedback-display');
+                const editFormDiv = feedbackItemLi.querySelector('.edit-feedback-form');
+                
+                editFormDiv.style.display = 'none'; // 隱藏編輯表單
+                displayDiv.style.display = 'block'; // 顯示靜態內容
+            });
+        });
+
+        // 處理編輯表單中的星級點選 和 儲存邏輯
+        document.querySelectorAll('.edit-feedback-form').forEach(editForm => {
+            const feedbackId = editForm.closest('li.list-group-item').id.replace('feedback-item-', '');
+            const starEditButtons = editForm.querySelectorAll('.star-edit-btn');
+            const selectedEditRatingInput = editForm.querySelector('.selected-edit-rating');
+            const ratingTextEditFeedback = editForm.querySelector('.rating-text-edit-feedback');
+            const commentEditTextarea = editForm.querySelector('.edit-comment-textarea');
+            const saveButton = editForm.querySelector('.save-feedback-btn');
+            const messageEditDiv = editForm.querySelector('.edit-feedback-message');
+
+            // 為編輯表單中的星級按鈕綁定事件
+            starEditButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const rating = parseInt(this.dataset.rating);
+                    selectedEditRatingInput.value = rating; // 更新隱藏 input 的值
+                    starEditButtons.forEach(btn => { // 更新所有編輯星星的樣式
+                        if (parseInt(btn.dataset.rating) <= rating) {
+                            btn.classList.add('selected', 'btn-warning');
+                            btn.classList.remove('btn-outline-secondary');
+                        } else {
+                            btn.classList.remove('selected', 'btn-warning');
+                            btn.classList.add('btn-outline-secondary');
+                        }
+                    });
+                    ratingTextEditFeedback.textContent = ratingMap[rating] || "";
+                });
+            });
+
+            saveButton.addEventListener('click', function () {
+                const newRating = parseInt(selectedEditRatingInput.value);
+                const newComment = commentEditTextarea.value.trim();
+
+                if (newRating === 0) {
+                    messageEditDiv.textContent = '請先選擇新的星級評分！';
+                    messageEditDiv.style.color = 'red';
+                    setTimeout(() => { messageEditDiv.textContent = ''; }, 3000);
+                    return;
+                }
+
+                const dataToSend = {
+                    rating: newRating,
+                    comment: newComment
+                };
+
+                messageEditDiv.textContent = '儲存中...';
+                messageEditDiv.style.color = 'blue';
+
+                const updateUrl = `/feedback/update/${feedbackId}/`; 
+
+                fetch(updateUrl, {
+                    method: 'POST', // 後端 update_feedback_view 使用 @require_POST
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errData => {
+                            throw new Error(errData.message || `請求失敗，狀態碼：${response.status}`);
+                        }).catch(() => {
+                             throw new Error(`請求失敗，狀態碼：${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success' && data.feedback) {
+                        messageEditDiv.textContent = data.message || '評價已成功更新！';
+                        messageEditDiv.style.color = 'green';
+
+                        // 更新頁面上的靜態顯示內容
+                        const feedbackItemLi = editForm.closest('li.list-group-item');
+                        const displayDiv = feedbackItemLi.querySelector('.feedback-display');
+                        
+                        displayDiv.querySelector('.display-rating-value').textContent = data.feedback.rating;
+                        
+                        // 更新星號顯示
+                        const displayStarsSpans = displayDiv.querySelectorAll('.display-rating-star');
+                        displayStarsSpans.forEach((starSpan, index) => {
+                            if ((index + 1) <= data.feedback.rating) {
+                                starSpan.style.color = 'orange';
+                                starSpan.textContent = '★';
+                            } else {
+                                starSpan.style.color = 'lightgray';
+                                starSpan.textContent = '☆';
+                            }
+                        });
+                        
+                        displayDiv.querySelector('.display-rating-text').textContent = 
+                            data.feedback.rating >= 4 ? (data.feedback.rating === 5 ? " - 太難" : " - 偏難") : 
+                            (data.feedback.rating === 3 ? " - 適中" : 
+                            (data.feedback.rating === 2 ? " - 偏簡單" : " - 太簡單"));
+
+
+                        displayDiv.querySelector('.display-comment').innerHTML = data.feedback.comment ? data.feedback.comment : '<i class="text-muted">(無評論)</i>';
+                        displayDiv.querySelector('.display-updated-at').textContent = `最後更新：${data.feedback.updated_at}`; // 假設後端回傳了格式化好的 updated_at
+                        
+                        // 更新編輯按鈕上的 data 屬性，以便下次編輯時是最新值
+                        const editBtn = displayDiv.querySelector('.edit-feedback-btn');
+                        editBtn.dataset.currentRating = data.feedback.rating;
+                        editBtn.dataset.currentComment = data.feedback.comment || '';
+
+                        // 隱藏編輯表單，顯示更新後的靜態內容
+                        editForm.style.display = 'none';
+                        displayDiv.style.display = 'block';
+
+                    } else {
+                        messageEditDiv.textContent = '錯誤：' + (data.message || '更新失敗，請稍後再試。');
+                        messageEditDiv.style.color = 'red';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating feedback:', error);
+                    messageEditDiv.textContent = '更新過程中發生錯誤：' + error.message;
+                    messageEditDiv.style.color = 'red';
+                });
+            });
+        });
+    });
+    </script>
+    {# Bootstrap JS #}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

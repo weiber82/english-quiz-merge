@@ -1,74 +1,183 @@
+{% comment %} core/templates/wrong_questions.html {% endcomment %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的錯題本</title>
+    <title>{{ page_title|default:"我的錯題本" }}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        body { padding-top: 20px; } /* 簡單的頁面邊距 */
+        body { padding-top: 20px; }
         .container { max-width: 960px; }
         .list-group-item { margin-bottom: 1rem; }
         .alert-info { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .action-buttons .btn { margin-left: 5px; margin-top: 5px; }
+        /* ⭐ 為篩選控制按鈕統一樣式 ⭐ */
+        .filter-controls a.btn, .filter-controls button.btn { 
+            margin-right: 5px; 
+            margin-bottom: 10px; 
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>我的錯題本 (S5 功能)</h2>
+            <h2>{{ page_title }}</h2>
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a>
         </div>
         <hr>
 
-        {# --- Topic 篩選區域 --- #}
-        <div class="topic-filter mb-3">
-            <strong>篩選主題：</strong>
-            <a href="{% url 'my_wrong_questions' %}" class="btn btn-sm {% if current_topic == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">全部錯題</a>
-            {% for topic_name in available_topics %}
-                <a href="{% url 'my_wrong_questions' %}?topic={{ topic_name }}" class="btn btn-sm {% if current_topic == topic_name %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ topic_name }}</a>
-            {% endfor %}
+        {# 修改篩選區域，包含主題篩選和檢視模式切換 #}
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 filter-controls">
+            {# --- Topic 篩選區域 (保持您現有的) --- #}
+            <div class="topic-filter">
+                <strong>篩選主題：</strong>
+                <a href="{% url 'my_wrong_questions' %}?view_mode={{ current_view_mode|default:'unfixed' }}&topic=all" 
+                   class="btn btn-sm {% if current_topic == 'all' or not current_topic %}btn-primary{% else %}btn-outline-primary{% endif %}">全部主題</a>
+                {% for topic_name_filter in available_topics %}
+                    <a href="{% url 'my_wrong_questions' %}?view_mode={{ current_view_mode|default:'unfixed' }}&topic={{ topic_name_filter }}" 
+                       class="btn btn-sm {% if current_topic == topic_name_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ topic_name_filter|capfirst }}</a>
+                {% endfor %}
+            </div>
+
+            {#  新增/修改：檢視模式切換按鈕  #}
+            <div class="view-mode-toggle">
+                {% if current_view_mode == 'fixed' %}
+                    <a href="{% url 'my_wrong_questions' %}?topic={{ current_topic|default:'all' }}&view_mode=unfixed" 
+                       class="btn btn-sm btn-info">查看待複習的錯題</a>
+                {% else %} {# 預設是 unfixed 模式，所以按鈕是查看 fixed #}
+                    <a href="{% url 'my_wrong_questions' %}?topic={{ current_topic|default:'all' }}&view_mode=fixed" 
+                       class="btn btn-sm btn-outline-info">查看已學會的錯題</a>
+                {% endif %}
+            </div>
         </div>
-        {# --- Topic 篩選區域結束 --- #}
+        {# --- 篩選區域結束 --- #}
 
         {% if wrong_questions %}
-            <ul class="list-group list-group-flush">
+            <ul class="list-group list-group-flush" id="wrong-question-list">
                 {% for wq in wrong_questions %}
-                    <li class="list-group-item">
-                        <h5 class="mb-1">題目 {{ forloop.counter }}：</h5>
-                        <p>{{ wq.question.content|linebreaksbr }}</p> {# 顯示題目內容 #}
-                        
+                    <li class="list-group-item" id="wrong-question-item-{{ wq.id }}">
+                        <h5 class="mb-1">題目 {{ forloop.counter }} (主題: {{ wq.question.topic|capfirst }}):</h5>
+                        <p>{{ wq.question.content|linebreaksbr }}</p>
                         {% if wq.note %}
-                            <div class="alert alert-info" role="alert">
-                                <strong>我的筆記：</strong> {{ wq.note|linebreaksbr }} {# 顯示筆記 #}
-                            </div>
+                        <div class="alert alert-info" role="alert">
+                            <strong>我的筆記：</strong> {{ wq.note|linebreaksbr }}
+                        </div>
                         {% endif %}
+                        <p><small class="text-muted">
+                            {% if wq.is_fixed and wq.fixed_dt %}
+                                於 {{ wq.fixed_dt|date:"Y-m-d H:i" }} 標記為已學會 (原答錯時間: {{ wq.last_wrong_time|date:"Y-m-d H:i" }})
+                            {% else %}
+                                最後答錯時間：{{ wq.last_wrong_time|date:"Y-m-d H:i" }}
+                            {% endif %}
+                        </small></p>
                         
-                        <p><small class="text-muted">最後答錯時間：{{ wq.last_wrong_time }}</small></p>
-                        
-                        <a href="{% url 'gpt_detail' %}?qid={{ wq.question.id }}" class="btn btn-sm btn-info">查看 GPT 詳解</a>
-                        
-                        {% comment %}
-                        <form method="post" action="{% url 'mark_as_reviewed' wq.id %}" style="display: inline-block; margin-left: 10px;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-success mt-2">我已複習 ✅</button>
-                        </form>
-                        {% endcomment %}
-
+                        <div class="action-buttons mt-2">
+                            <a href="{% url 'gpt_detail' %}?qid={{ wq.question.id }}" class="btn btn-sm btn-info">查看 GPT 詳解</a>
+                            {# 「已學會」按鈕只在查看「未學會」列表 (current_view_mode == 'unfixed') 時顯示 #}
+                            {% if current_view_mode == 'unfixed' %} 
+                            <button type="button" class="btn btn-sm btn-success mark-as-fixed-btn" data-wq-id="{{ wq.id }}">
+                                ✓ 我已學會
+                            </button>
+                            {% endif %}
+                            {# 如果是已學會列表，並且您將來想加入「標記為未學會」功能，可以在這裡加按鈕 #}
+                        </div>
+                        <div class="mark-fixed-message mt-1 small" style="min-height: 1.2em;"></div>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
             <div class="alert alert-success mt-3" role="alert">
-                {% if current_topic == 'all' or not current_topic %}
-                    太棒了！你的錯題本目前是空的！ 🎉
-                {% else %}
-                    太棒了！你在「{{ current_topic }}」這個主題下沒有錯題！🎉
+                {% if current_view_mode == 'fixed' %}
+                    {% if current_topic == 'all' or not current_topic %}
+                        您還沒有標記任何錯題為「已學會」。
+                    {% else %}
+                        您在「{{ current_topic|capfirst }}」這個主題下沒有標記為「已學會」的錯題。
+                    {% endif %}
+                {% else %} {# unfixed or default #}
+                    {% if current_topic == 'all' or not current_topic %}
+                        太棒了！目前沒有需要複習的錯題！ 🎉
+                    {% else %}
+                        太棒了！你在「{{ current_topic|capfirst }}」這個主題下沒有需要複習的錯題！🎉
+                    {% endif %}
                 {% endif %}
             </div>
         {% endif %}
     </div>
 
+    {% csrf_token %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            document.querySelectorAll('.mark-as-fixed-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const wrongQuestionId = this.dataset.wqId;
+                    const listItem = this.closest('li.list-group-item');
+                    const messageDiv = listItem.querySelector('.mark-fixed-message');
+
+                    if (!wrongQuestionId) { console.error("錯誤：按鈕缺少 data-wq-id 屬性。"); if(messageDiv){messageDiv.textContent = '錯誤：無法識別題目。'; messageDiv.style.color = 'red';} return; }
+                    if (!confirm("確定要將此題標記為「已學會」嗎？標記後將從此列表移除。")) { return; }
+                    if(messageDiv) { messageDiv.textContent = '處理中...'; messageDiv.style.color = 'blue';}
+                    
+                    const url = `/wrong-question/mark-fixed/${wrongQuestionId}/`; 
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': csrftoken },
+                    })
+                    .then(response => { if (!response.ok) { return response.json().then(errData => { throw new Error(errData.message || `請求失敗，狀態碼：${response.status}`); }).catch(() => { throw new Error(`請求失敗，狀態碼：${response.status}, 伺服器回應非JSON格式`); }); } return response.json(); })
+                    .then(data => {
+                        if (data.status === 'success') {
+                            if(messageDiv) { messageDiv.textContent = data.message || '題目已成功標記為已學會！'; messageDiv.style.color = 'green';}
+                            if (listItem) { 
+                                listItem.style.transition = 'opacity 0.5s ease-out';
+                                listItem.style.opacity = '0';
+                                setTimeout(() => {
+                                    listItem.remove();
+                                    const list = document.getElementById('wrong-question-list');
+                                    if (list && list.children.length === 0) {
+                                        const containerDiv = document.querySelector('.container');
+                                        let alertDiv = containerDiv.querySelector('.alert-success');
+                                        if (!alertDiv) { 
+                                            alertDiv = document.createElement('div');
+                                            alertDiv.className = 'alert alert-success mt-3';
+                                            alertDiv.setAttribute('role', 'alert');
+                                            const topicFilterDiv = containerDiv.querySelector('.filter-controls'); // 找 filter-controls
+                                            if (topicFilterDiv && topicFilterDiv.nextSibling) {
+                                                topicFilterDiv.parentNode.insertBefore(alertDiv, topicFilterDiv.nextSibling);
+                                            } else if (topicFilterDiv) {
+                                                 topicFilterDiv.insertAdjacentElement('afterend', alertDiv);
+                                            } else { containerDiv.appendChild(alertDiv); }
+                                        }
+                                        const currentViewModeForMsg = document.querySelector('.view-mode-toggle .btn-primary')?.textContent.includes("待複習") ? "unfixed" : "fixed"; // 從按鈕狀態推斷
+                                        const currentTopicFilterText = document.querySelector('.topic-filter .btn-primary')?.textContent.trim() || "全部";
+                                        
+                                        if (currentViewModeForMsg === 'fixed') {
+                                            if (currentTopicFilterText === "全部主題"){
+                                                alertDiv.innerHTML = '您還沒有標記任何錯題為「已學會」。';
+                                            } else {
+                                                alertDiv.innerHTML = `您在「${currentTopicFilterText}」這個主題下沒有標記為「已學會」的錯題。`;
+                                            }
+                                        } else {
+                                            if (currentTopicFilterText === "全部主題"){
+                                                alertDiv.innerHTML = '太棒了！你的錯題本目前是空的（沒有未學會的錯題）！ 🎉';
+                                            } else {
+                                                alertDiv.innerHTML = `太棒了！你在「${currentTopicFilterText}」這個主題下沒有需要複習的錯題（沒有未學會的錯題）！🎉`;
+                                            }
+                                        }
+                                        alertDiv.style.display = 'block';
+                                        if(list) list.style.display = 'none';
+                                    }
+                                }, 500); 
+                            }
+                        } else { if(messageDiv) { messageDiv.textContent = (data.status === 'info' ? '提示：' : '錯誤：') + (data.message || '操作未成功。'); messageDiv.style.color = (data.status === 'info' ? 'blue' : 'red');}}
+                    })
+                    .catch(error => { console.error('Error marking question as fixed:', error); if(messageDiv) { messageDiv.textContent = '操作過程中發生錯誤：' + error.message; messageDiv.style.color = 'red';}});
+                });
+            });
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
