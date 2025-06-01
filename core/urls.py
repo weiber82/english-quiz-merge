@@ -27,6 +27,17 @@ urlpatterns = [
     
     path('diagnose-weakness/', views.diagnose_weakness_view, name='diagnose_weakness'),
     path('grade-history/', views.grade_history_view, name='grade_history'),
+    path('manage-questions/index/', views.manage_questions_index_view, name='manage_questions_index'),
+    path('manage-questions/create/', views.manage_questions_create_view, name='manage_questions_create'),
+    path('manage-questions/edit/<int:question_id>/', views.manage_questions_edit_view, name='manage_questions_edit'),
+    path('manage-questions/delete/<int:question_id>/', views.manage_questions_delete_view, name='manage_questions_delete'),
+    path('import_excel/index/', views.import_excel_index_view, name='import_excel_index'),
+    path('import-excel/download_template/', views.import_excel_download_template_view, name='import_excel_download_template'),
+    path('import-excel/upload_file/', views.import_excel_upload_file_view, name='import_excel_upload_file'),
+    path('import-excel/cancel_preview/', views.import_excel_cancel_preview_view, name='import_excel_cancel_preview'),
+    path('import-excel/confirm/', views.import_excel_confirm_save_view, name='import_excel_confirm'),
+    path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
+    path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
     path('wrong-challenge/', views.start_wrong_challenge, name='wrong_challenge'),
     path('wrong-challenge/submit/', views.submit_wrong_challenge, name='submit_wrong_challenge'),
     # --- S8 新增的 URL ---
