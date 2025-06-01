@@ -44,13 +44,20 @@
 </head>
 <body>
     <div class="container">
+        {% if messages %}
+          <div id="alert-container">
+            {% for message in messages %}
+              <div id="alertBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>題庫管理（A1）</h2>
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a>
         </div>
         <hr>
-
-        {# --- Topic 篩選區域 --- #}
         <div class="topic-filter mb-3 d-flex justify-content-between flex-wrap align-items-center">
             <!-- 左側：篩選主題 -->
             <div class="d-flex align-items-center flex-wrap">
@@ -79,7 +86,6 @@
             </div>
         </div>
         {# --- Topic 篩選區域結束 --- #}
-
         {% if all_questions %}
             {% if all_questions.has_other_pages %}
                 <nav aria-label="Page navigation">
@@ -120,7 +126,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center" id="heading{{ forloop.counter }}">
                         <button class="accordion-toggle-btn" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
                             aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
-                            題目 {{ all_questions.start_index|add:forloop.counter0 }}
+                            題目 {{ all_questions.start_index|add:forloop.counter0 }} ：{{ q.content|truncatechars:30 }}
                         </button>
                         <div class="d-flex align-items-center">
                             <a href="{% url 'manage_questions_edit' q.id %}" class="text-secondary mr-3" title="編輯">
@@ -237,7 +243,12 @@
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                <a href="#" class="btn btn-danger" id="confirmDeleteBtn">確定刪除</a>
+                <form id="confirmform" action="#" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" title="刪除">
+                      刪除
+                    </button>
+                </form>
                 </div>
             </div>
             </div>
@@ -247,6 +258,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // 自動在 2 秒後關閉 alert
+            setTimeout(function () {
+              $('#alertBox').alert('close');
+          }, 2000);
+          });
         $(document).ready(function () {
           $('#deleteModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // 觸發 modal 的按鈕
@@ -255,7 +272,7 @@
       
             var modal = $(this);
             modal.find('#deleteItemTitle').text(title);        // 換掉 modal 中的標題文字
-            modal.find('#confirmDeleteBtn').attr('href', url); // 設定刪除連結
+            modal.find('#confirmform').attr('action', url); // 設定刪除連結
           });
         });
       </script>
