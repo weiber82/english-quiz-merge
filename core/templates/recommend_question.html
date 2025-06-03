@@ -12,7 +12,11 @@
 {% if error %}
   <p class="text-danger">{{ error }}</p>
 {% else %}
-  <h2 class="mb-4">🎯 題型精練推薦系統</h2>
+  <h2 class="mb-4">🎯 題型精練推薦系統(S11)</h2>
+  <p class="text-muted">
+  AI 根據你近期答錯的題目，以相似題型自動生成新題目，幫助你針對弱點練習。<br>
+  本區練習不計分，請盡情挑戰自己！
+  </p>
   <p><strong>題目：</strong> {{ question.content }}</p>
 
   <div class="d-grid gap-3 my-4">
