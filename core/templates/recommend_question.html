@@ -1,0 +1,108 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 題型精練推薦</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-5" data-question-id="{{ question.id }}">
+
+{% if error %}
+  <p class="text-danger">{{ error }}</p>
+{% else %}
+  <h2 class="mb-4">🎯 題型精練推薦系統</h2>
+  <p><strong>題目：</strong> {{ question.content }}</p>
+
+  <div class="d-grid gap-3 my-4">
+    {% for key, value in question.options.items %}
+      <button type="button" class="btn btn-outline-dark choice" data-value="{{ key }}">
+        {{ key }}. {{ value }}
+      </button>
+    {% endfor %}
+  </div>
+
+  <div class="d-flex justify-content-center mt-4">
+    <form method="post" id="answerForm">
+      {% csrf_token %}
+      <input type="hidden" name="answer" id="answerInput">
+      <button type="submit" id="submitBtn" class="btn btn-primary px-4 py-2 fs-5">
+        提交答案
+      </button>
+    </form>
+  </div>
+
+  <!-- 🆕 詳解區塊 -->
+  <div id="explanation" class="mt-4" style="display: none;">
+    <div id="explanation-text" class="alert alert-info"></div>
+  </div>
+
+  <div class="d-flex justify-content-between mt-5">
+    <a href="{% url 'ai_recommend' %}" class="btn btn-outline-secondary">🔄 再推薦一題</a>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">⬅ 回主頁</a>
+  </div>
+
+  <script>
+    function selectOption(option) {
+      const choices = document.querySelectorAll(".choice");
+      choices.forEach(btn => btn.classList.remove("btn-primary", "btn-danger", "btn-success"));
+      option.classList.add("btn-primary");
+    }
+
+    function submitAnswer(correctAnswer, explanationText) {
+      const selected = document.querySelector(".choice.btn-primary");
+      if (!selected) {
+        alert("請選擇一個答案！");
+        return;
+      }
+
+      const selectedValue = selected.getAttribute("data-value");
+      const explanationDiv = document.getElementById("explanation");
+      const explanationTextDiv = document.getElementById("explanation-text");
+
+      selected.classList.remove("btn-primary");
+
+      if (selectedValue === correctAnswer) {
+        selected.classList.add("btn-success");
+        explanationTextDiv.innerHTML = "<strong>✅ 正確！</strong> " + explanationText;
+      } else {
+        selected.classList.add("btn-danger");
+        const correctBtn = document.querySelector(`[data-value='${correctAnswer}']`);
+        if (correctBtn) correctBtn.classList.add("btn-success");
+
+        explanationTextDiv.innerHTML =
+          "<strong>❌ 錯誤！</strong> " + explanationText;
+      }
+
+      explanationDiv.style.display = "block";
+      document.getElementById("submitBtn").disabled = true;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const buttons = document.querySelectorAll(".choice");
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => selectOption(btn));
+      });
+
+      const form = document.getElementById("answerForm");
+      if (form) {
+        form.addEventListener("submit", (e) => {
+          const selected = document.querySelector(".choice.btn-primary");
+          if (selected) {
+            document.getElementById("answerInput").value = selected.getAttribute("data-value");
+            e.preventDefault();  // ❌ 改為 JS 評分，不送出表單
+            submitAnswer("{{ question.answer }}", `{{ explanation|escapejs }}`);
+          } else {
+            alert("請選擇一個答案！");
+            e.preventDefault();
+          }
+        });
+      }
+    });
+  </script>
+
+{% endif %}
+
+</body>
+</html>

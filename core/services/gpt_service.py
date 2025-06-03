@@ -1,3 +1,5 @@
+from core.models import Explanation
+
 # --- 這是你定義的核心弱點分類和相關關鍵字 (你需要擴充和調整關鍵字) ---
 CORE_WEAKNESS_CATEGORIES_KEYWORDS = {
     "動詞時態": ["時態", "tense", "過去式", "完成式", "現在式", "未來式", "verb form", "動詞變化"],
@@ -16,6 +18,7 @@ CORE_WEAKNESS_CATEGORIES_KEYWORDS = {
     # 你可以再新增一個 "其他" 分類來接住無法匹配的主題
     "其他弱點": [] 
 }
+
 
 def map_gpt_topics_to_core_categories(gpt_generated_topics):
     """
@@ -47,9 +50,31 @@ class GPTExplanationService:
     def __init__(self, gpt_client):
         self.gpt_client = gpt_client
 
-    def explain(self, question, answer, options):
-        prompt = self._build_prompt(question, answer, options)
-        return self.gpt_client.get_response(prompt)
+
+    # def explain(self, question, answer, options):
+    #     prompt = self._build_prompt(question, answer, options)
+    #     return self.gpt_client.get_response(prompt)
+
+
+    def explain(self, question, selected_option):
+        # 先查快取
+        cached = Explanation.get_cached(question, selected_option)
+
+        if cached:
+            return cached.explanation_text   # 判斷是否有一樣選項的 GPT 詳解資料
+
+        # 無快取 → 呼叫 GPT
+        prompt = self._build_prompt(question.content, selected_option, question.options)
+        explanation = self.gpt_client.get_response(prompt)
+
+        # 使用封裝的方法建立快取
+        Explanation.create_from_gpt(
+            question=question,
+            selected_option=selected_option,
+            explanation_text=explanation
+        )
+
+        return explanation
 
 
     def _build_prompt(self, q, a, options):
@@ -60,6 +85,7 @@ class GPTExplanationService:
                 {options_text}
                 正確答案：{a}
                 請用中文母語的觀點解釋，評斷學生可能錯誤的原因，幫助學生學習。"""
+    
                 
     def _build_s6_prompt(self, sampled_wrong_questions_data, predefined_weak_topics=None):
         # sampled_wrong_questions_data: 一個列表，每項包含一道錯題的資訊
@@ -92,6 +118,7 @@ class GPTExplanationService:
         prompt_parts.append("文字摘要：[一段綜合的文字摘要，說明學生的主要學習問題和建議]")
         
         return "\n".join(prompt_parts)
+    
 
     def analyze_weaknesses(self, wrong_questions_data_list, predefined_weak_topics=None): # predefined_weak_topics 這裡可以先不用
         if not wrong_questions_data_list:
@@ -139,5 +166,67 @@ class GPTExplanationService:
         print(f"Mapped Core Weakness Topics: {core_weakness_topics}") # <--- 在這裡看映射後的核心主題
 
         return {"weak_topics": core_weakness_topics, "summary": summary_text}
+    
 
+    def _build_s11_prompt(self, question, wrong_option):
+        options_str = "\n".join([f"{key}. {value}" for key, value in question.options.items()])
+        return f"""請根據以下英文選擇題與錯誤選項，設計一題類似概念與文法點的練習題，單字題也出相關性高的。
 
+        原始題目：{question.content}
+        選項：
+        {options_str}
+        錯誤選項：{wrong_option}
+
+        請用以下格式回覆：
+        題目：...
+        A. ...
+        B. ...
+        C. ...
+        D. ...
+        正確答案：...
+        詳解：...（請用 150 字內說明學生常見誤解，並說明正確答案的判斷關鍵，並建議加強練習方向）"""
+
+    def generate_similar_question(self, original_question, wrong_option):
+        prompt = self._build_s11_prompt(original_question, wrong_option)
+        gpt_response = self.gpt_client.get_response(prompt)
+
+        print("🔎 GPT 回傳內容：", gpt_response)
+
+        content = ""
+        options = {}
+        answer = ""
+        explanation = ""
+
+        lines = gpt_response.strip().split('\n')
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith("題目："):
+                content = line.replace("題目：", "").strip()
+            elif any(line.startswith(f"{opt}.") for opt in "ABCD"):
+                parts = line.split('.', 1)
+                if len(parts) == 2:
+                    key = parts[0].strip()
+                    value = parts[1].strip()
+                    if key in "ABCD":
+                        options[key] = value
+            elif line.startswith("正確答案："):
+                answer_part = line.replace("正確答案：", "").strip()
+                if "." in answer_part:
+                    answer = answer_part.split('.')[0].strip().upper()
+                else:
+                    answer = answer_part.strip().upper()
+            elif line.startswith("詳解："):
+                explanation = line.replace("詳解：", "").strip()
+
+        if not content or not options or answer not in options:
+            print("❌ GPT 回傳格式有誤")
+            return None
+
+        print("✅ 解析成功：", content, options, answer, explanation)
+        return {
+            "content": content,
+            "options": options,
+            "answer": answer,
+            "explanation": explanation
+        }

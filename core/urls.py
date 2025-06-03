@@ -48,4 +48,7 @@ urlpatterns = [
     path('feedback/submit/', views.submit_feedback_view, name='submit_feedback'),
     path('my-feedback/', views.my_feedback_view, name='my_feedback'),
     path('feedback/update/<int:feedback_id>/', views.update_feedback_view, name='update_feedback'),
+
+    # --- S11 題型精練推薦 ---
+    path('ai/recommend/', views.generate_similar_question_page_view, name='ai_recommend'),
 ]

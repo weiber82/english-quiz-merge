@@ -114,6 +114,20 @@ class Question(models.Model):
         except cls.DoesNotExist:
             return False
         
+
+    @classmethod
+    def create_from_gpt(cls, content, options, answer, topic):
+        """
+        封裝 GPT 題目的建立邏輯
+        """
+        return cls.objects.create(
+            content=content,
+            options=options,
+            answer=answer,
+            topic=topic,
+            is_gpt_generated=True
+        )
+        
     
 class TestRecord(models.Model):
     test_result_id = models.CharField(max_length=64) 
@@ -167,6 +181,11 @@ class TestRecord(models.Model):
     def get_wrong_records(cls, user_id, test_result_id):
         return cls.get_test_records(user_id, test_result_id).filter(is_correct=False)
     
+
+    @classmethod
+    def get_latest_by_user_and_question(cls, user, question):
+        return cls.objects.filter(user=user, question=question, is_correct=False).order_by('-timestamp').first()
+
 
     @classmethod
     def get_recent_test_session_summaries(cls, user, limit=10):
@@ -232,24 +251,92 @@ class WeakTopic(models.Model):
         return cls.objects.filter(user=user).order_by('-last_diagnosed')
 
 
+# class Explanation(models.Model):
+#     question = models.OneToOneField(Question, on_delete=models.CASCADE)
+#     explanation_text = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     source = models.CharField(max_length=50, default='gpt')
+
+#     def __str__(self):
+#         return f"詳解 - Q{self.question.id}"
+
+
 class Explanation(models.Model):
-    question = models.OneToOneField(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.CharField(max_length=1)  # 使用者當時選錯的選項
     explanation_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=50, default='gpt')
 
+    class Meta:
+        unique_together = ('question', 'selected_option')
+
     def __str__(self):
-        return f"詳解 - Q{self.question.id}"
+        return f"詳解 - Q{self.question.id} (選 {self.selected_option})"
+
+    @classmethod
+    def create_from_gpt(cls, question, selected_option, explanation_text):
+        """
+        封裝 GPT 詳解建立邏輯，避免在 service 中操作 ORM 細節。
+        """
+        return cls.objects.create(
+            question=question,
+            selected_option=selected_option,
+            explanation_text=explanation_text,
+            source='gpt'
+        )
+    
+
+    @classmethod
+    def get_cached(cls, question, selected_option):
+        return cls.objects.filter(
+            question=question,
+            selected_option=selected_option
+        ).first()
+
+
+# class GptLog(models.Model):
+#     original_question = models.ForeignKey(Question, related_name='origin', on_delete=models.CASCADE)
+#     generated_question = models.ForeignKey(Question, related_name='generated', on_delete=models.CASCADE)
+#     topic = models.CharField(max_length=50)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"GPT 出題記錄：{self.topic}"
 
 
 class GptLog(models.Model):
     original_question = models.ForeignKey(Question, related_name='origin', on_delete=models.CASCADE)
     generated_question = models.ForeignKey(Question, related_name='generated', on_delete=models.CASCADE)
     topic = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
+    wrong_option = models.CharField(max_length=1, default="")
+    explanation = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('original_question', 'wrong_option')
 
     def __str__(self):
-        return f"GPT 出題記錄：{self.topic}"
+        return f"Q{self.original_question.id} 錯選 {self.wrong_option} → 精練題 Q{self.generated_question.id}"
+
+    # 查詢：這題某選項是否已經生成過精練題
+    @classmethod
+    def get_cached_similar_question(cls, original_question, wrong_option):
+        return cls.objects.filter(
+            original_question=original_question,
+            wrong_option=wrong_option
+        ).select_related('generated_question').first()
+
+    # 建立一筆新的 GPT 精練題快取記錄
+    @classmethod
+    def create_log_entry(cls, original_question, generated_question, wrong_option, explanation=None):
+        return cls.objects.create(
+            original_question=original_question,
+            generated_question=generated_question,
+            topic=original_question.topic,
+            wrong_option=wrong_option,
+            explanation=explanation            
+        )
+
 
 
 class Feedback(models.Model):
@@ -523,7 +610,51 @@ class WrongQuestion(models.Model):
                         .values_list('question__topic', flat=True) \
                         .distinct() \
                         .order_by('question__topic')
+    
+
+    @classmethod
+    def get_by_id_and_user(cls, wqid, user):
+        """
+        取得指定使用者的特定錯題紀錄。
+        封裝 get(id=..., user=...) 查詢，避免視圖直接操作 ORM。
+        """
+        try:
+            return cls.objects.get(id=wqid, user=user)
+        except cls.DoesNotExist:
+            return None
+
                           
 
-        
+class ImproveSuggestion(models.Model):
+    question = models.OneToOneField(Question, on_delete=models.CASCADE)
+    need_improve = models.BooleanField(default=False)
+    suggestion = models.JSONField(default=dict, blank=True)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        status = "需要改善" if self.need_improve else "不需改善"
+        return f"Q{self.question.id} 的建議 ({status})"
+
+    @classmethod
+    def need_improve_by_id(cls, question_id):
+        """
+        根據題目 ID 判斷是否標記為需要改善。
+        """
+        try:
+            suggestion_obj = cls.objects.get(question_id=question_id)
+            return suggestion_obj.need_improve
+        except cls.DoesNotExist:
+            return False
+
+    @classmethod
+    def get_suggestion_by_id(cls, question_id):
+        """
+        根據題目 ID 取得改善建議（若有的話）。
+        """
+        try:
+            suggestion_obj = cls.objects.get(question_id=question_id)
+            return suggestion_obj.suggestion if suggestion_obj.need_improve else None
+        except cls.DoesNotExist:
+            return None

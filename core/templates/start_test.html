@@ -61,10 +61,10 @@
 
       <!-- 是否包含 GPT 生成題目 -->
       <div class="mb-3">
-        <label class="form-label fw-bold">是否包含 GPT 生成題目：</label><br>
+        <label class="form-label fw-bold">是否包含 GPT 生成的題目：</label><br>
         <div class="btn-group" role="group" id="gpt-buttons">
-          <button type="button" class="btn btn-outline-success" data-value="yes">包含</button>
           <button type="button" class="btn btn-outline-success" data-value="no">排除</button>
+          <button type="button" class="btn btn-outline-success" data-value="yes">包含</button>
         </div>
         <input type="hidden" name="include_gpt" id="gpt-input">
       </div>
@@ -76,6 +76,10 @@
     </div>
   </div>
 </form>
+
+<div class="container mt-4 text-center">
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary w-100">⬅️ 返回主頁</a>
+</div>
 
 <script>
   function enableSingleSelect(groupId, inputId) {
@@ -94,6 +98,42 @@
   enableSingleSelect("topic-buttons", "topic-input");
   enableSingleSelect("count-buttons", "count-input");
   enableSingleSelect("gpt-buttons", "gpt-input");
+
+
+    function enableSingleSelect(groupId, inputId) {
+    const group = document.getElementById(groupId);
+    const buttons = group.querySelectorAll("button");
+    const input = document.getElementById(inputId);
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        input.value = btn.getAttribute("data-value");
+      });
+    });
+  }
+
+  function setDefaultValue(groupId, inputId, defaultValue) {
+    const group = document.getElementById(groupId);
+    const buttons = group.querySelectorAll("button");
+    const input = document.getElementById(inputId);
+    input.value = defaultValue;
+    buttons.forEach(btn => {
+      if (btn.getAttribute("data-value") === defaultValue) {
+        btn.classList.add("active");
+      }
+    });
+  }
+
+  enableSingleSelect("topic-buttons", "topic-input");
+  enableSingleSelect("count-buttons", "count-input");
+  enableSingleSelect("gpt-buttons", "gpt-input");
+
+  // 預設值設定
+  setDefaultValue("topic-buttons", "topic-input", "vocab");
+  setDefaultValue("count-buttons", "count-input", "5");
+  setDefaultValue("gpt-buttons", "gpt-input", "no");
+
 </script>
 
 </body>

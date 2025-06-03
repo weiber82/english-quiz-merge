@@ -17,11 +17,11 @@
       <div class="card mb-4 shadow-sm">
         <div class="card-body">
           <!-- 題目與取消收藏 -->
-          <div class="d-flex justify-content-between align-items-start">
-            <p class="mb-2"><strong>題目：</strong> {{ item.question.content }}</p>
-            <form method="POST" action="{% url 'toggle_favorite' item.question.id %}">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <p class="mb-2 flex-grow-1"><strong>題目：</strong> {{ item.question.content }}</p>
+            <form method="POST" action="{% url 'toggle_favorite' item.question.id %}" class="flex-shrink-0">
               {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-outline-danger ms-2">🗑️ 取消收藏</button>
+              <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ 取消收藏</button>
             </form>
           </div>
 
@@ -55,6 +55,11 @@
   {% else %}
     <p class="text-muted">目前尚無筆記收藏。</p>
   {% endif %}
+
+  <!-- 回主頁按鈕 -->
+  <div class="mt-4 text-center">
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary w-100">⬅️ 返回主頁</a>
+  </div>
 </div>
 
 </body>

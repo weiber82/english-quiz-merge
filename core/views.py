@@ -9,7 +9,7 @@ from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
 from .forms import QuestionForm, UserCreateForm
-from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic, Feedback, User
+from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic, Feedback, User, GptLog
 from django.core.paginator import Paginator
 from dotenv import load_dotenv
 import json
@@ -111,11 +111,19 @@ class PracticeSession:
         self.test_result_id = str(uuid.uuid4())
         self.selected_questions = []
 
+    # def initialize(self):
+    #     self.selected_questions = random.sample(
+    #         Question.get_by_topic(self.config.topic, self.config.include_gpt),
+    #         k=self.config.count
+    #     )
+
+    #0603TEST
+
     def initialize(self):
-        self.selected_questions = random.sample(
-            Question.get_by_topic(self.config.topic, self.config.include_gpt),
-            k=self.config.count
-        )
+        all_questions = Question.get_by_topic(self.config.topic, self.config.include_gpt)
+        k = min(len(all_questions), self.config.count)  # ⭐ 保證不會抽超過題庫數
+        self.selected_questions = random.sample(all_questions, k=k)
+        
 
     def to_session_data(self):
         return {
@@ -247,31 +255,44 @@ def gpt_detail_view(request):
     if not question:
         return HttpResponseNotFound("題目不存在")
 
-    # 查詢是否已收藏
-    # is_starred = Favorite.objects.filter(user_id=user_id, question=question).exists()
+    # 收藏狀態
     is_starred = Favorite.is_starred(user_id=user_id, question_id=question.id)
 
-
-    # 找下一題編號（如果有）
-    test_questions = request.session.get('test_questions', [])
-    next_index = None
-    if qid in test_questions:
-        index = test_questions.index(qid)
-        if index + 1 < len(test_questions):
-            next_index = index + 1
-
-    # 取得回答記錄
+    # 回答記錄
     answers = request.session.get('answers', {})
     selected = answers.get(str(qid))
+
+    # 預設標記
+    next_index = None
+    in_test_session = False
+    just_finished_test = False
+    from_test_flow = False
+
+    test_questions = request.session.get('test_questions', [])
+
+    try:
+        idx = test_questions.index(str(qid))
+
+        # 判斷是否為測驗流程中的正常跳轉
+        if len(answers) == idx:
+            from_test_flow = True
+            in_test_session = True
+            if idx + 1 < len(test_questions):
+                next_index = idx + 1
+            else:
+                just_finished_test = True
+
+        # 額外補一個 just_finished_test（例如從 result 再點詳解）
+        elif idx + 1 == len(test_questions):
+            just_finished_test = True
+
+    except ValueError:
+        pass
 
     # GPT 解釋
     client = OpenAIClient(api_key=os.getenv("OPENAI_API_KEY"))
     service = GPTExplanationService(gpt_client=client)
-    explanation = service.explain(
-        question.content,
-        question.answer,
-        question.options
-    )
+    explanation = service.explain(question, selected)
 
     return render(request, 'gpt_detail.html', {
         'question': question,
@@ -279,6 +300,9 @@ def gpt_detail_view(request):
         'explanation': explanation,
         'is_starred': is_starred,
         'next_index': next_index,
+        'in_test_session': in_test_session,
+        'just_finished_test': just_finished_test,
+        'from_test_flow': from_test_flow,  # ✅ 多傳一個這個
     })
 
 
@@ -287,7 +311,6 @@ def user_management_view(request):
     if not user_id:
         return redirect('login')
 
-    # current_user = User.objects.get(id=user_id)
     current_user = User.get_by_id(user_id)
     if current_user.role != 'admin':
         return HttpResponseForbidden("你沒有權限瀏覽此頁面")
@@ -300,14 +323,12 @@ def user_management_view(request):
             messages.error(request, "無法修改自己的權限。")
             return redirect('user_management')
 
-        # target_user = User.objects.get(id=target_id)
         target_user = User.get_by_id(target_id)
         target_user.role = new_role
         target_user.save()
         messages.success(request, f"使用者 {target_user.username} 已更新為 {new_role}。")
         return redirect('user_management')
 
-    # users = User.objects.all()
     users = User.get_all()
     return render(request, 'user_management.html', {'users': users})
 
@@ -326,10 +347,9 @@ def save_answer_view(request):
             question = Question.get_by_id(qid)
             TestRecord.save_answer(user_id, question, ans, test_result_id)
 
-            # ✅ 如果答錯，就寫入 WrongQuestion
+            #  如果答錯，就寫入 WrongQuestion
             if ans != question.answer:
                 try:
-                    # current_user = User.objects.get(id=user_id)
                     current_user = User.get_by_id(user_id)
                     WrongQuestion.get_or_create(
                         user=current_user,
@@ -435,7 +455,6 @@ def wrong_questions_view(request):
     return render(request, 'wrong_questions.html', context)
 
 
-@login_required
 @require_POST # 標記為已學會是一個修改操作，用 POST
 def mark_wrong_question_fixed_view(request, wrong_question_id):
     user_id_from_session = request.session.get('user_id')
@@ -446,7 +465,8 @@ def mark_wrong_question_fixed_view(request, wrong_question_id):
 
     try:
         # 直接查詢，並確保是屬於當前使用者的錯題
-        wrong_question_entry = WrongQuestion.objects.get(id=wrong_question_id, user=current_user)
+        # wrong_question_entry = WrongQuestion.objects.get(id=wrong_question_id, user=current_user)  0603fix
+        wrong_question_entry = WrongQuestion.get_by_id_and_user(wrong_question_id, current_user)
 
         # 呼叫在 WrongQuestion 模型中定義的 mark_as_learned (或類似名稱) 方法
         changed = wrong_question_entry.mark_as_learned() # 假設方法名是 mark_as_learned
@@ -961,7 +981,6 @@ def submit_wrong_challenge(request):
 
 
 # --- S8 新增的視圖函式 ---
-@login_required 
 @require_POST 
 def submit_feedback_view(request):
     try:
@@ -1028,7 +1047,6 @@ def submit_feedback_view(request):
         return JsonResponse({'status': 'error', 'message': '提交評價時發生未預期的伺服器錯誤。'}, status=500)
     
     
-@login_required
 def my_feedback_view(request):
     user_id_from_session = request.session.get('user_id')
     current_user = User.get_by_id(user_id_from_session)
@@ -1058,7 +1076,6 @@ def my_feedback_view(request):
     return render(request, 'my_feedback.html', context)
 
 
-@login_required
 @require_POST 
 def update_feedback_view(request, feedback_id): # 
     try:
@@ -1115,3 +1132,67 @@ def update_feedback_view(request, feedback_id): #
     except Exception as e:
         print(f"內部錯誤 in update_feedback_view (feedback_id: {feedback_id}): {type(e).__name__} - {e}") #用 print 偵錯
         return JsonResponse({'status': 'error', 'message': '更新評價時發生未預期的伺服器錯誤。'}, status=500)
+
+
+def generate_similar_question_page_view(request):
+    user_id_from_session = request.session.get('user_id')
+    current_user = User.get_by_id(user_id_from_session)
+
+    if not current_user:
+        return render(request, 'recommend_question.html', {
+            'error': '請先登入後再使用此功能（Session 遺失）。'
+        })
+
+    user = current_user
+
+    wrong_q_list = WrongQuestion.get_unfixed_by_user(user)
+    if not wrong_q_list:
+        return render(request, 'recommend_question.html', {
+            'error': '目前無可推薦的錯題，請先完成更多測驗。'
+        })
+
+    selected_wrong = random.choice(list(wrong_q_list))
+    original_q = selected_wrong.question
+
+    # ✅ 用你自訂的方法取最新紀錄
+    last_record = TestRecord.get_latest_by_user_and_question(user, original_q)
+
+    if not last_record or last_record.is_correct:
+        return render(request, 'recommend_question.html', {
+            'error': '找不到該題的錯誤選項。'
+        })
+
+    wrong_option = last_record.selected_option
+
+    log_entry = GptLog.get_cached_similar_question(original_q, wrong_option)
+    if log_entry:
+        q = log_entry.generated_question
+        source = 'GPT快取（Cache）'
+        explanation = log_entry.explanation or ''
+    else:
+        api_key = os.getenv("OPENAI_API_KEY")
+        gpt_client = OpenAIClient(api_key)
+        gpt_service = GPTExplanationService(gpt_client=gpt_client)
+
+        gpt_result = gpt_service.generate_similar_question(original_q, wrong_option)
+
+        if not gpt_result:
+            return render(request, 'recommend_question.html', {
+                'error': 'GPT 產生失敗或格式錯誤，請稍後再試。'
+            })
+
+        q = Question.create_from_gpt(
+            content=gpt_result['content'],
+            options=gpt_result['options'],
+            answer=gpt_result['answer'],
+            topic=original_q.topic
+        )
+        GptLog.create_log_entry(original_q, q, wrong_option, explanation=gpt_result.get('explanation', ''))
+        source = 'GPT 生成'
+        explanation = gpt_result.get('explanation', '')
+
+    return render(request, 'recommend_question.html', {
+        'question': q,
+        'source': source,
+        'explanation': explanation
+    })
