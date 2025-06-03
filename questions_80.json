@@ -1,962 +1,1082 @@
 [
   {
-    "content": "Choose the word closest in meaning to: 'That'",
+    "content": "Choose the word closest in meaning to: 'Rapid'",
     "options": {
-      "A": "have",
-      "B": "cup",
-      "C": "per",
-      "D": "That"
-    },
-    "answer": "D",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Film'",
-    "options": {
-      "A": "to",
-      "B": "Film",
-      "C": "support",
-      "D": "now"
+      "A": "Slow",
+      "B": "Quick",
+      "C": "Heavy",
+      "D": "Late"
     },
     "answer": "B",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Live'",
+    "content": "Choose the word closest in meaning to: 'Assist'",
     "options": {
-      "A": "population",
-      "B": "Live",
-      "C": "son",
-      "D": "take"
+      "A": "Help",
+      "B": "Ignore",
+      "C": "Forget",
+      "D": "Blame"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Tiny'",
+    "options": {
+      "A": "Large",
+      "B": "Thick",
+      "C": "Small",
+      "D": "Fast"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Silent'",
+    "options": {
+      "A": "Noisy",
+      "B": "Quiet",
+      "C": "Busy",
+      "D": "Warm"
     },
     "answer": "B",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Lose'",
+    "content": "Choose the word closest in meaning to: 'Purchase'",
     "options": {
-      "A": "Lose",
-      "B": "discover",
-      "C": "send",
-      "D": "technology"
-    },
-    "answer": "A",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Later'",
-    "options": {
-      "A": "respond",
-      "B": "nice",
-      "C": "Later",
-      "D": "together"
+      "A": "Sell",
+      "B": "Fix",
+      "C": "Buy",
+      "D": "Create"
     },
     "answer": "C",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Role'",
+    "content": "Choose the word closest in meaning to: 'Bright'",
     "options": {
-      "A": "easy",
-      "B": "recent",
-      "C": "Role",
-      "D": "message"
-    },
-    "answer": "C",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Happen'",
-    "options": {
-      "A": "Happen",
-      "B": "instead",
-      "C": "company",
-      "D": "decision"
-    },
-    "answer": "A",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Walk'",
-    "options": {
-      "A": "Walk",
-      "B": "bit",
-      "C": "help",
-      "D": "authority"
-    },
-    "answer": "A",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Side'",
-    "options": {
-      "A": "onto",
-      "B": "Side",
-      "C": "commercial",
-      "D": "fish"
+      "A": "Smart",
+      "B": "Shiny",
+      "C": "Dark",
+      "D": "Empty"
     },
     "answer": "B",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Similar'",
+    "content": "Choose the word closest in meaning to: 'Journey'",
     "options": {
-      "A": "Similar",
-      "B": "walk",
-      "C": "instead",
-      "D": "goal"
-    },
-    "answer": "A",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'You'",
-    "options": {
-      "A": "You",
-      "B": "expert",
-      "C": "red",
-      "D": "shoulder"
-    },
-    "answer": "A",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Body'",
-    "options": {
-      "A": "Body",
-      "B": "nation",
-      "C": "break",
-      "D": "can"
-    },
-    "answer": "A",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Environmental'",
-    "options": {
-      "A": "candidate",
-      "B": "green",
-      "C": "Environmental",
-      "D": "discuss"
-    },
-    "answer": "C",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Myself'",
-    "options": {
-      "A": "before",
-      "B": "Myself",
-      "C": "say",
-      "D": "read"
+      "A": "Work",
+      "B": "Trip",
+      "C": "Game",
+      "D": "Race"
     },
     "answer": "B",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Democrat'",
+    "content": "Choose the word closest in meaning to: 'Delicious'",
     "options": {
-      "A": "its",
-      "B": "everybody",
-      "C": "the",
-      "D": "Democrat"
+      "A": "Tasty",
+      "B": "Ugly",
+      "C": "Burned",
+      "D": "Raw"
     },
-    "answer": "D",
+    "answer": "A",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Certain'",
+    "content": "Choose the word closest in meaning to: 'Quickly'",
     "options": {
-      "A": "least",
-      "B": "large",
-      "C": "Certain",
-      "D": "peace"
-    },
-    "answer": "C",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Work'",
-    "options": {
-      "A": "heavy",
-      "B": "morning",
-      "C": "director",
-      "D": "Work"
-    },
-    "answer": "D",
-    "topic": "vocab",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the word closest in meaning to: 'Painting'",
-    "options": {
-      "A": "discussion",
-      "B": "glass",
-      "C": "Painting",
-      "D": "what"
+      "A": "Slowly",
+      "B": "Rarely",
+      "C": "Fast",
+      "D": "Clearly"
     },
     "answer": "C",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Affect'",
+    "content": "Choose the word closest in meaning to: 'Dangerous'",
     "options": {
-      "A": "production",
-      "B": "project",
-      "C": "Affect",
-      "D": "style"
+      "A": "Safe",
+      "B": "Risky",
+      "C": "Easy",
+      "D": "Boring"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Begin'",
+    "options": {
+      "A": "End",
+      "B": "Close",
+      "C": "Start",
+      "D": "Break"
     },
     "answer": "C",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the word closest in meaning to: 'Left'",
+    "content": "Choose the word closest in meaning to: 'Huge'",
     "options": {
-      "A": "property",
-      "B": "nearly",
-      "C": "Left",
-      "D": "on"
+      "A": "Big",
+      "B": "Tiny",
+      "C": "Light",
+      "D": "Soft"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Angry'",
+    "options": {
+      "A": "Sad",
+      "B": "Happy",
+      "C": "Mad",
+      "D": "Calm"
     },
     "answer": "C",
     "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the correct form: 'Environmental'",
+    "content": "Choose the word closest in meaning to: 'Beautiful'",
     "options": {
-      "A": "Environmental",
-      "B": "report",
-      "C": "financial",
-      "D": "from"
+      "A": "Pretty",
+      "B": "Ugly",
+      "C": "Dirty",
+      "D": "Funny"
     },
     "answer": "A",
-    "topic": "grammar",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the correct form: 'True'",
+    "content": "Choose the word closest in meaning to: 'Laugh'",
     "options": {
-      "A": "various",
-      "B": "True",
-      "C": "or",
-      "D": "want"
+      "A": "Cry",
+      "B": "Smile",
+      "C": "Yell",
+      "D": "Giggle"
+    },
+    "answer": "D",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Clean'",
+    "options": {
+      "A": "Messy",
+      "B": "Neat",
+      "C": "Wet",
+      "D": "Old"
     },
     "answer": "B",
-    "topic": "grammar",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the correct form: 'While'",
+    "content": "Choose the word closest in meaning to: 'Friend'",
     "options": {
-      "A": "While",
-      "B": "nature",
-      "C": "economy",
-      "D": "security"
-    },
-    "answer": "A",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'West'",
-    "options": {
-      "A": "so",
-      "B": "tax",
-      "C": "road",
-      "D": "West"
-    },
-    "answer": "D",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Simple'",
-    "options": {
-      "A": "make",
-      "B": "pull",
-      "C": "manage",
-      "D": "Simple"
-    },
-    "answer": "D",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Fine'",
-    "options": {
-      "A": "north",
-      "B": "southern",
-      "C": "mean",
-      "D": "Fine"
-    },
-    "answer": "D",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Reveal'",
-    "options": {
-      "A": "finally",
-      "B": "Reveal",
-      "C": "community",
-      "D": "say"
+      "A": "Enemy",
+      "B": "Buddy",
+      "C": "Teacher",
+      "D": "Boss"
     },
     "answer": "B",
-    "topic": "grammar",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the correct form: 'Along'",
+    "content": "Choose the word closest in meaning to: 'Speak'",
     "options": {
-      "A": "up",
-      "B": "imagine",
-      "C": "open",
-      "D": "Along"
-    },
-    "answer": "D",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Us'",
-    "options": {
-      "A": "Us",
-      "B": "hair",
-      "C": "consumer",
-      "D": "war"
+      "A": "Talk",
+      "B": "Listen",
+      "C": "Shout",
+      "D": "Write"
     },
     "answer": "A",
-    "topic": "grammar",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the correct form: 'Pay'",
+    "content": "Choose the word closest in meaning to: 'Cold'",
     "options": {
-      "A": "Pay",
-      "B": "art",
-      "C": "cold",
-      "D": "their"
-    },
-    "answer": "A",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Seven'",
-    "options": {
-      "A": "task",
-      "B": "sing",
-      "C": "Seven",
-      "D": "common"
+      "A": "Warm",
+      "B": "Hot",
+      "C": "Cool",
+      "D": "Dry"
     },
     "answer": "C",
-    "topic": "grammar",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the correct form: 'Hear'",
+    "content": "Choose the word closest in meaning to: 'Jump'",
     "options": {
-      "A": "before",
-      "B": "final",
-      "C": "agreement",
-      "D": "Hear"
-    },
-    "answer": "D",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Kitchen'",
-    "options": {
-      "A": "either",
-      "B": "Kitchen",
-      "C": "consumer",
-      "D": "authority"
+      "A": "Sit",
+      "B": "Leap",
+      "C": "Walk",
+      "D": "Crawl"
     },
     "answer": "B",
-    "topic": "grammar",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Choose the correct form: 'Heavy'",
+    "content": "We won’t see the sun even after the typhoon leaves, because the news said that heavier rain will soon _____.",
     "options": {
-      "A": "bit",
-      "B": "Heavy",
-      "C": "daughter",
-      "D": "election"
-    },
-    "answer": "B",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Near'",
-    "options": {
-      "A": "establish",
-      "B": "Near",
-      "C": "seat",
-      "D": "bed"
-    },
-    "answer": "B",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Fill'",
-    "options": {
-      "A": "Fill",
-      "B": "along",
-      "C": "may",
-      "D": "scientist"
-    },
-    "answer": "A",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'One'",
-    "options": {
-      "A": "One",
-      "B": "stop",
-      "C": "policy",
-      "D": "paper"
-    },
-    "answer": "A",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Value'",
-    "options": {
-      "A": "Value",
-      "B": "officer",
-      "C": "activity",
-      "D": "discussion"
-    },
-    "answer": "A",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Spend'",
-    "options": {
-      "A": "drive",
-      "B": "present",
-      "C": "Spend",
-      "D": "whatever"
-    },
-    "answer": "C",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Choose the correct form: 'Government'",
-    "options": {
-      "A": "unit",
-      "B": "Government",
-      "C": "chair",
-      "D": "almost"
-    },
-    "answer": "B",
-    "topic": "grammar",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Tax ___ space'",
-    "options": {
-      "A": "thing",
-      "B": "whole",
-      "C": "day",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Realize ___ thing'",
-    "options": {
-      "A": "yourself",
-      "B": "bill",
-      "C": "is",
-      "D": "bank"
-    },
-    "answer": "C",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Movie ___ establish'",
-    "options": {
-      "A": "doctor",
-      "B": "is",
-      "C": "dog",
-      "D": "type"
-    },
-    "answer": "B",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Meet ___ state'",
-    "options": {
-      "A": "cover",
-      "B": "is",
-      "C": "Mr",
-      "D": "individual"
-    },
-    "answer": "B",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Kid ___ event'",
-    "options": {
-      "A": "community",
-      "B": "our",
-      "C": "is",
-      "D": "tonight"
-    },
-    "answer": "C",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Even ___ town'",
-    "options": {
-      "A": "is",
-      "B": "eight",
-      "C": "last",
-      "D": "way"
-    },
-    "answer": "A",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Animal ___ try'",
-    "options": {
-      "A": "animal",
-      "B": "day",
-      "C": "leave",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Experience ___ risk'",
-    "options": {
-      "A": "is",
-      "B": "challenge",
-      "C": "drive",
-      "D": "evidence"
-    },
-    "answer": "A",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Arm ___ might'",
-    "options": {
-      "A": "exist",
-      "B": "and",
-      "C": "is",
-      "D": "personal"
-    },
-    "answer": "C",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Board ___ trouble'",
-    "options": {
-      "A": "owner",
-      "B": "is",
-      "C": "meeting",
-      "D": "radio"
-    },
-    "answer": "B",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Seem ___ significant'",
-    "options": {
-      "A": "treatment",
-      "B": "material",
-      "C": "mind",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Audience ___ keep'",
-    "options": {
-      "A": "rich",
-      "B": "home",
-      "C": "is",
-      "D": "suggest"
-    },
-    "answer": "C",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Camera ___ eye'",
-    "options": {
-      "A": "cold",
-      "B": "mission",
-      "C": "partner",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Between ___ occur'",
-    "options": {
-      "A": "is",
-      "B": "clearly",
-      "C": "project",
-      "D": "mean"
-    },
-    "answer": "A",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'With ___ skill'",
-    "options": {
-      "A": "organization",
-      "B": "coach",
-      "C": "leader",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Get ___ stop'",
-    "options": {
-      "A": "example",
-      "B": "mention",
-      "C": "enjoy",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Sing ___ ready'",
-    "options": {
-      "A": "is",
-      "B": "including",
-      "C": "big",
+      "A": "catch",
+      "B": "follow",
+      "C": "move",
       "D": "stop"
     },
-    "answer": "A",
-    "topic": "cloze",
+    "answer": "B",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Fill in the blank: 'Officer ___ one'",
+    "content": "Please speak more clearly. I can’t _____ what you’re saying.",
     "options": {
-      "A": "radio",
-      "B": "get",
-      "C": "our",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Establish ___ fine'",
-    "options": {
-      "A": "product",
-      "B": "writer",
-      "C": "eat",
-      "D": "is"
-    },
-    "answer": "D",
-    "topic": "cloze",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Fill in the blank: 'Sing ___ rest'",
-    "options": {
-      "A": "is",
-      "B": "fast",
-      "C": "side",
-      "D": "force"
+      "A": "hear",
+      "B": "see",
+      "C": "touch",
+      "D": "guess"
     },
     "answer": "A",
-    "topic": "cloze",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Human number person white democratic bring.'",
+    "content": "My dad always _____ a cup of coffee before going to work.",
     "options": {
-      "A": "Yes",
-      "B": "land",
-      "C": "no",
-      "D": "product"
+      "A": "makes",
+      "B": "does",
+      "C": "plays",
+      "D": "draws"
     },
     "answer": "A",
-    "topic": "reading",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Specific section easy million bar thought kid.'",
+    "content": "After a long day at school, Jerry felt very _____.",
     "options": {
-      "A": "Yes",
-      "B": "hotel",
-      "C": "red",
-      "D": "even"
+      "A": "hungry",
+      "B": "tired",
+      "C": "excited",
+      "D": "lucky"
     },
-    "answer": "A",
-    "topic": "reading",
+    "answer": "B",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Commercial soldier first show occur it rule hear system operation question history start.'",
+    "content": "Be careful with that glass! If you drop it, it will _____.",
     "options": {
-      "A": "image",
-      "B": "rest",
-      "C": "Yes",
-      "D": "adult"
+      "A": "shine",
+      "B": "float",
+      "C": "break",
+      "D": "run"
     },
     "answer": "C",
-    "topic": "reading",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Star media memory remember back power stock visit increase its walk.'",
+    "content": "Lily was _____ when she saw the beautiful sunset by the beach.",
     "options": {
-      "A": "security",
-      "B": "president",
-      "C": "Yes",
-      "D": "necessary"
+      "A": "bored",
+      "B": "amazed",
+      "C": "sleepy",
+      "D": "noisy"
     },
-    "answer": "C",
-    "topic": "reading",
+    "answer": "B",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Modern article Mrs free see individual sister ability occur performance national help answer.'",
+    "content": "The museum is closed on Mondays, so we have to go there on _____.",
     "options": {
-      "A": "Yes",
-      "B": "Congress",
-      "C": "themselves",
-      "D": "product"
+      "A": "Tuesday",
+      "B": "Sunday",
+      "C": "Friday",
+      "D": "Monday"
     },
     "answer": "A",
-    "topic": "reading",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Audience work above message move Mr fill system tend.'",
+    "content": "To stay healthy, people should eat more fruits and _____.",
     "options": {
-      "A": "however",
-      "B": "billion",
-      "C": "mother",
-      "D": "Yes"
+      "A": "vegetables",
+      "B": "candies",
+      "C": "pizzas",
+      "D": "drinks"
     },
-    "answer": "D",
-    "topic": "reading",
+    "answer": "A",
+    "topic": "vocab",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Coach over enjoy specific myself perform better hard.'",
+    "content": "Tom didn’t bring an umbrella, so he got completely _____ in the rain.",
     "options": {
-      "A": "people",
-      "B": "Yes",
-      "C": "ready",
-      "D": "nearly"
+      "A": "hot",
+      "B": "wet",
+      "C": "dry",
+      "D": "clean"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The baby was crying, but she _____ as soon as her mother held her.",
+    "options": {
+      "A": "laughed",
+      "B": "stopped",
+      "C": "ran",
+      "D": "ate"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  }
+  {
+    "content": "Jenny is a college student. She wakes up early every day and goes for a run before breakfast. After that, she attends her classes and studies in the library in the afternoon. What does Jenny do before breakfast?",
+    "options": {
+      "A": "She eats a big meal",
+      "B": "She goes running",
+      "C": "She studies in the library",
+      "D": "She attends class"
     },
     "answer": "B",
     "topic": "reading",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Open lead remain cause none body majority yes soon source.'",
+    "content": "Tom loves animals. He volunteers at the animal shelter on weekends. He helps feed the dogs and clean their cages. Where does Tom volunteer?",
     "options": {
-      "A": "account",
-      "B": "Yes",
-      "C": "reduce",
-      "D": "second"
-    },
-    "answer": "B",
-    "topic": "reading",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Read the passage and answer the question: 'Allow court theory can develop specific choose concern more level.'",
-    "options": {
-      "A": "major",
-      "B": "Yes",
-      "C": "right",
-      "D": "knowledge"
-    },
-    "answer": "B",
-    "topic": "reading",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Read the passage and answer the question: 'Ready generation pattern travel edge contain.'",
-    "options": {
-      "A": "relationship",
-      "B": "television",
-      "C": "Yes",
-      "D": "letter"
+      "A": "At a hospital",
+      "B": "At a school",
+      "C": "At an animal shelter",
+      "D": "At a park"
     },
     "answer": "C",
     "topic": "reading",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Fund responsibility good start husband actually court six light.'",
+    "content": "Maria enjoys cooking. She often watches cooking shows and tries new recipes. Her favorite dish to cook is spaghetti. What does Maria like to cook the most?",
     "options": {
-      "A": "Congress",
-      "B": "artist",
-      "C": "Yes",
-      "D": "most"
+      "A": "Pizza",
+      "B": "Spaghetti",
+      "C": "Salad",
+      "D": "Soup"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The library is open from 9 a.m. to 8 p.m. on weekdays. It is closed on Sundays. On Saturdays, it opens from 10 a.m. to 4 p.m. When is the library closed?",
+    "options": {
+      "A": "On Monday",
+      "B": "On Saturday",
+      "C": "On Sunday",
+      "D": "On Friday"
     },
     "answer": "C",
     "topic": "reading",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'You better course argue author involve camera good.'",
+    "content": "Leo planted some flowers in his garden last spring. Now they have grown tall and are full of colorful blossoms. What happened to the flowers Leo planted?",
     "options": {
-      "A": "issue",
-      "B": "Yes",
-      "C": "ask",
+      "A": "They died",
+      "B": "They grew tall and blossomed",
+      "C": "They were picked",
+      "D": "They did not grow"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Amy goes to the gym every morning. She exercises for one hour before heading to work. What does Amy do every morning?",
+    "options": {
+      "A": "She eats breakfast",
+      "B": "She goes shopping",
+      "C": "She goes to the gym",
+      "D": "She watches TV"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "It rained all day yesterday, so the soccer game was canceled. What happened to the soccer game?",
+    "options": {
+      "A": "It was played late",
+      "B": "It was moved indoors",
+      "C": "It was canceled",
+      "D": "It was rescheduled for the morning"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Anna is reading a mystery novel. She enjoys stories with exciting plots and surprising endings. What kind of stories does Anna enjoy?",
+    "options": {
+      "A": "Science books",
+      "B": "Mystery novels",
+      "C": "History books",
+      "D": "Poetry"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Ben works at a bakery. Every morning, he makes bread and cakes for customers. What does Ben do for work?",
+    "options": {
+      "A": "He delivers packages",
+      "B": "He cooks at a restaurant",
+      "C": "He bakes bread and cakes",
+      "D": "He sells vegetables"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The zoo has many animals, including lions, elephants, and monkeys. Children love visiting the zoo on weekends. What do children enjoy doing on weekends?",
+    "options": {
+      "A": "Visiting the zoo",
+      "B": "Playing video games",
+      "C": "Staying home",
+      "D": "Going to school"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Nancy went to the supermarket to buy vegetables, fruits, and some snacks. Where did Nancy go?",
+    "options": {
+      "A": "To the park",
+      "B": "To the bakery",
+      "C": "To the supermarket",
+      "D": "To the bookstore"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Peter always wears a helmet when he rides his bicycle. He believes safety is important. What does Peter wear for safety?",
+    "options": {
+      "A": "Gloves",
+      "B": "A hat",
+      "C": "A helmet",
+      "D": "Sunglasses"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "It snowed heavily last night, so the school is closed today. Why is the school closed?",
+    "options": {
+      "A": "It’s summer vacation",
+      "B": "There was heavy snow",
+      "C": "There was a fire drill",
+      "D": "It’s a national holiday"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Sally waters her plants every evening. She enjoys watching them grow. What does Sally do in the evening?",
+    "options": {
+      "A": "She eats dinner",
+      "B": "She reads a book",
+      "C": "She waters her plants",
+      "D": "She feeds her dog"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Kevin was feeling sick, so he went to see a doctor. Why did Kevin go to the doctor?",
+    "options": {
+      "A": "To get medicine",
+      "B": "To play a game",
+      "C": "To go to work",
+      "D": "To meet a friend"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The movie started at 7:00 p.m., but Lisa arrived at 7:30 p.m. When did Lisa arrive at the movie?",
+    "options": {
+      "A": "On time",
+      "B": "Early",
+      "C": "Late",
+      "D": "At 6:30"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "David always turns off the lights when he leaves a room. He wants to save electricity. Why does David turn off the lights?",
+    "options": {
+      "A": "To save electricity",
+      "B": "To sleep better",
+      "C": "To keep the room cool",
+      "D": "To clean the room"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Helen went to the beach and forgot to wear sunscreen. Now her skin is red and painful. What happened to Helen?",
+    "options": {
+      "A": "She got a sunburn",
+      "B": "She got a tan",
+      "C": "She got cold",
+      "D": "She fell"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The bakery near our house sells fresh bread every morning. Many people line up early to buy it. Why do people go to the bakery early?",
+    "options": {
+      "A": "To avoid the heat",
+      "B": "To get fresh bread",
+      "C": "To see friends",
+      "D": "To get coffee"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Oliver lost his keys and couldn’t get into his house. He had to wait for his sister to bring the spare key. Why did Oliver have to wait?",
+    "options": {
+      "A": "He forgot his phone",
+      "B": "He didn’t have money",
+      "C": "He lost his keys",
+      "D": "He missed the bus"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  }
+  {
+    "content": "She is looking forward _____ her vacation next week.",
+    "options": {
+      "A": "to",
+      "B": "for",
+      "C": "on",
+      "D": "at"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The kids made fun _____ the new student.",
+    "options": {
+      "A": "with",
+      "B": "for",
+      "C": "of",
+      "D": "to"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He succeeded _____ passing the driving test on his first try.",
+    "options": {
+      "A": "on",
+      "B": "in",
+      "C": "at",
+      "D": "with"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Jenny insisted _____ paying for the meal.",
+    "options": {
+      "A": "on",
+      "B": "in",
+      "C": "at",
+      "D": "to"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He is responsible _____ cleaning the office every Friday.",
+    "options": {
+      "A": "to",
+      "B": "with",
+      "C": "for",
+      "D": "by"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The teacher was angry _____ the students for being noisy.",
+    "options": {
+      "A": "on",
+      "B": "at",
+      "C": "about",
+      "D": "with"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "My parents are proud _____ my accomplishments.",
+    "options": {
+      "A": "of",
+      "B": "about",
+      "C": "with",
+      "D": "for"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "She apologized _____ being late to the meeting.",
+    "options": {
+      "A": "of",
+      "B": "for",
+      "C": "to",
+      "D": "with"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "They congratulated her _____ winning the prize.",
+    "options": {
+      "A": "about",
+      "B": "in",
+      "C": "on",
+      "D": "for"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "I’m interested _____ learning how to play the guitar.",
+    "options": {
+      "A": "in",
+      "B": "at",
+      "C": "with",
+      "D": "for"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He’s afraid _____ speaking in public.",
+    "options": {
+      "A": "to",
+      "B": "for",
+      "C": "with",
+      "D": "of"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "This book is full _____ useful information.",
+    "options": {
+      "A": "of",
+      "B": "with",
+      "C": "by",
+      "D": "on"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He ran _____ money before the end of the month.",
+    "options": {
+      "A": "away",
+      "B": "of",
+      "C": "over",
+      "D": "out of"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Please take care _____ my dog while I’m away.",
+    "options": {
+      "A": "for",
+      "B": "of",
+      "C": "with",
       "D": "to"
     },
     "answer": "B",
-    "topic": "reading",
+    "topic": "cloze",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Focus expert avoid create like hear range.'",
+    "content": "We need to deal _____ this issue immediately.",
     "options": {
-      "A": "region",
-      "B": "and",
-      "C": "Yes",
-      "D": "dream"
+      "A": "on",
+      "B": "at",
+      "C": "with",
+      "D": "to"
     },
     "answer": "C",
-    "topic": "reading",
+    "topic": "cloze",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Again out foot fight network big threat response similar threat cost mouth.'",
+    "content": "Tom got married _____ a woman he met in college.",
     "options": {
-      "A": "movement",
-      "B": "Yes",
-      "C": "crime",
-      "D": "opportunity"
-    },
-    "answer": "B",
-    "topic": "reading",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Read the passage and answer the question: 'Admit produce approach marriage article interest purpose day yourself suffer adult attack.'",
-    "options": {
-      "A": "trade",
-      "B": "Yes",
-      "C": "night",
-      "D": "service"
-    },
-    "answer": "B",
-    "topic": "reading",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Read the passage and answer the question: 'Across financial full have Congress management also attention.'",
-    "options": {
-      "A": "wide",
-      "B": "Yes",
-      "C": "inside",
-      "D": "attack"
-    },
-    "answer": "B",
-    "topic": "reading",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Read the passage and answer the question: 'Player free open author south name.'",
-    "options": {
-      "A": "fill",
-      "B": "Yes",
-      "C": "summer",
-      "D": "age"
-    },
-    "answer": "B",
-    "topic": "reading",
-    "is_gpt_generated": false
-  },
-  {
-    "content": "Read the passage and answer the question: 'Affect shoulder instead manager item maybe system up kind.'",
-    "options": {
-      "A": "six",
-      "B": "himself",
-      "C": "Yes",
-      "D": "mouth"
+      "A": "with",
+      "B": "by",
+      "C": "to",
+      "D": "for"
     },
     "answer": "C",
-    "topic": "reading",
+    "topic": "cloze",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Finish create summer big cold article.'",
+    "content": "She is very good _____ math.",
     "options": {
-      "A": "write",
-      "B": "enter",
-      "C": "involve",
-      "D": "Yes"
+      "A": "in",
+      "B": "on",
+      "C": "at",
+      "D": "to"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "We agreed _____ meet at 7 p.m. at the restaurant.",
+    "options": {
+      "A": "on",
+      "B": "to",
+      "C": "for",
+      "D": "with"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He apologized to his friend _____ the misunderstanding.",
+    "options": {
+      "A": "for",
+      "B": "of",
+      "C": "about",
+      "D": "on"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Many students are worried _____ their final exams.",
+    "options": {
+      "A": "with",
+      "B": "about",
+      "C": "at",
+      "D": "by"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  }
+  {
+    "content": "People got very excited when they watched Ms. Smith ______ at the party.",
+    "options": {
+      "A": "danced",
+      "B": "dancing",
+      "C": "has danced",
+      "D": "to dance"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "I tried on these shoes in several different _____, and I thought the white pair looked best on me.",
+    "options": {
+      "A": "colors",
+      "B": "prices",
+      "C": "shapes",
+      "D": "sizes"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Rex did not feel the earthquake this morning. He _____ in the park at the time.",
+    "options": {
+      "A": "jogged",
+      "B": "was jogging",
+      "C": "has jogged",
+      "D": "would jog"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The teacher asked the students _____ their homework before class.",
+    "options": {
+      "A": "finishing",
+      "B": "to finish",
+      "C": "finished",
+      "D": "finish"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Neither Tom nor his friends _____ coming to the party.",
+    "options": {
+      "A": "is",
+      "B": "was",
+      "C": "are",
+      "D": "be"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "If I _____ more time, I would travel around the world.",
+    "options": {
+      "A": "have",
+      "B": "had",
+      "C": "will have",
+      "D": "has"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "She _____ to music when I entered the room.",
+    "options": {
+      "A": "listens",
+      "B": "was listening",
+      "C": "listened",
+      "D": "is listening"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "By the time we arrived, the movie _____.",
+    "options": {
+      "A": "had started",
+      "B": "starts",
+      "C": "is starting",
+      "D": "has started"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Susan is the girl _____ won the speech contest.",
+    "options": {
+      "A": "which",
+      "B": "what",
+      "C": "who",
+      "D": "where"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Let me know as soon as he _____.",
+    "options": {
+      "A": "arrives",
+      "B": "arrived",
+      "C": "will arrive",
+      "D": "has been arriving"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He has lived in Japan _____ five years.",
+    "options": {
+      "A": "since",
+      "B": "during",
+      "C": "for",
+      "D": "by"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Not only she but also her parents _____ interested in the program.",
+    "options": {
+      "A": "is",
+      "B": "are",
+      "C": "was",
+      "D": "has"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "You should have told me if you _____ help.",
+    "options": {
+      "A": "need",
+      "B": "needed",
+      "C": "have needed",
+      "D": "had needed"
     },
     "answer": "D",
-    "topic": "reading",
+    "topic": "grammar",
     "is_gpt_generated": false
   },
   {
-    "content": "Read the passage and answer the question: 'Event be service newspaper never everyone nothing heart condition see may within property.'",
+    "content": "The book was so interesting that I couldn't _____ it down.",
     "options": {
-      "A": "side",
-      "B": "short",
-      "C": "Yes",
-      "D": "watch"
+      "A": "set",
+      "B": "let",
+      "C": "put",
+      "D": "make"
     },
     "answer": "C",
-    "topic": "reading",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "This is the best movie I _____ seen.",
+    "options": {
+      "A": "never",
+      "B": "have ever",
+      "C": "had ever",
+      "D": "did ever"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He asked me where I _____ from.",
+    "options": {
+      "A": "come",
+      "B": "came",
+      "C": "comes",
+      "D": "was come"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Mary speaks English better than _____ in her class.",
+    "options": {
+      "A": "anyone",
+      "B": "someone",
+      "C": "everyone",
+      "D": "no one"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "I don’t know whether he _____ come or not.",
+    "options": {
+      "A": "will",
+      "B": "would",
+      "C": "shall",
+      "D": "should"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The coffee smells _____.",
+    "options": {
+      "A": "well",
+      "B": "good",
+      "C": "better",
+      "D": "best"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Each of the students _____ a dictionary.",
+    "options": {
+      "A": "need",
+      "B": "have",
+      "C": "needs",
+      "D": "are"
+    },
+    "answer": "C",
+    "topic": "grammar",
     "is_gpt_generated": false
   }
 ]
