@@ -103,13 +103,26 @@
 
           <div class="border rounded p-3 mb-3">
             <strong>通過率：</strong>
-            <span id="pass-rate-{{ q.id }}" class="text-primary font-weight-bold">載入中...</span>
+            <span class="text-primary font-weight-bold">{{ q.pass_rate|default:"-" }}</span>
           </div>
 
-          <hr>
-          <strong>各選項被選擇分析：</strong>
-          <div id="option-stats-{{ q.id }}" style="display:none;"></div>
-          <hr>
+          <div class="border rounded p-3 mb-3">
+            <strong>平均難易度：</strong>
+            <span class="text-warning font-weight-bold">{{ q.avg_rating|default:"-" }}</span>
+          </div>
+
+          <div class="border rounded p-3 mb-3 bg-light">
+            <strong>使用者建議：</strong>
+            {% if q.feedbacks %}
+              <ul class="mb-0">
+                {% for fb in q.feedbacks %}
+                  <li><i class="bi bi-chat-quote-fill"></i> {{ fb.comment|default:"（無建議）" }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-muted">尚無建議。</p>
+            {% endif %}
+          </div>
 
           <div class="mt-4">
             <strong>對此題目的建議：</strong>

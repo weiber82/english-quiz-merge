@@ -273,6 +273,51 @@
   
       new Chart(document.getElementById('topicPieChart'), config);
 
+      function submitSuggestion(qid) {
+        const textarea = document.getElementById(`suggestion-text-${qid}`);
+        const suggestion = textarea.value.trim();
+      
+        if (!suggestion) {
+          alert('請輸入建議內容');
+          return;
+        }
+      
+        fetch('/analysis/submit-suggestion/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: `question_id=${encodeURIComponent(qid)}&suggestion=${encodeURIComponent(suggestion)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById(`suggestion-result-${qid}`).style.display = 'block';
+          } else {
+            alert('送出失敗：' + data.message);
+          }
+        })
+        .catch(err => {
+          console.error('送出建議失敗', err);
+          alert('發送時發生錯誤，請稍後再試。');
+        });
+      }
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (const cookie of cookies) {
+            const trimmed = cookie.trim();
+            if (trimmed.startsWith(name + '=')) {
+              cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
       
   </script>
 </body>

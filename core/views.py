@@ -12,7 +12,7 @@ from .services.gpt_service import GPTExplanationService
 from .services.openai_client import OpenAIClient
 from .services.auth_service import AuthService
 from .forms import QuestionForm, UserCreateForm
-from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic, Feedback, User, GptLog
+from .models import User, Favorite, Question, TestRecord, WrongQuestion, WeakTopic, Feedback, User, GptLog, ImproveSuggestion
 from django.core.paginator import Paginator
 from dotenv import load_dotenv
 import json
@@ -588,7 +588,6 @@ def manage_questions_index_view(request):
 
     question_list = Question.get_by_topic(
         topic=selected_topic,
-        include_gpt='no'
     )
     
     if selected_topic == 'all' or not selected_topic:
@@ -596,8 +595,9 @@ def manage_questions_index_view(request):
     else:
         question_list = Question.get_by_topic(
         topic=selected_topic,
-        include_gpt='no'
         )
+    for q in question_list:
+        q.need_improve = ImproveSuggestion.need_improve_by_id(q.id)
     
     paginator = Paginator(question_list, 10)  # 每頁 10 題
     page_number = request.GET.get('page')
@@ -654,7 +654,7 @@ def manage_questions_edit_view(request, question_id):
         messages.warning(request, "您沒有權限瀏覽此頁面。")
         return redirect('dashboard')
 
-    question = get_object_or_404(Question, id=question_id)
+    question = Question.get_by_id(question_id)
 
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
@@ -693,6 +693,30 @@ def manage_questions_delete_view(request, question_id):
     
     return redirect('manage_questions_index')
 
+# A1 題庫管理 已解決須檢討題目
+def manage_questions_edit_view(request, question_id):
+    question = Question.get_by_id(question_id)
+    form = QuestionForm(instance=question)
+
+    suggestions = ImproveSuggestion.list_by_question(question_id)
+
+    context = {
+        'form': form,
+        'question': question,
+        'suggestions': suggestions,
+    }
+    return render(request, 'manage_questions/edit.html', context)
+
+
+@require_POST
+def resolve_suggestion(request):
+    suggestion_id = request.POST.get('suggestion_id')
+    print(suggestion_id)
+    if not suggestion_id:
+        return JsonResponse({'success': False, 'message': '缺少 suggestion_id'})
+
+    success = ImproveSuggestion.mark_resolved_by_id(suggestion_id)
+    return JsonResponse({'success': success})
 
 # A2 Excel題庫匯入 首頁
 def import_excel_index_view(request):
@@ -988,6 +1012,31 @@ def analysis_index_view(request):
         return JsonResponse(response_data)
 
 
+# A4 測驗分析與報表下載 發送建議
+@require_POST
+def analysis_submit_improve_suggestion(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'success': False, 'message': '尚未登入'}, status=403)
+
+    question_id = request.POST.get('question_id')
+    suggestion_text = request.POST.get('suggestion', '').strip()
+
+    if not question_id or not suggestion_text:
+        return JsonResponse({'success': False, 'message': '缺少欄位'}, status=400)
+
+    try:
+        ImproveSuggestion.add_suggestion(
+            question_id=question_id,
+            user_id=user_id,
+            suggestion=suggestion_text
+        )
+        return JsonResponse({'success': True, 'message': '建議已儲存'})
+    except ImproveSuggestion.DoesNotExist:
+        return JsonResponse({'success': False, 'message': '找不到題目'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
 # A5 題目品質查詢與回覆 首頁
 def quality_index_view(request):
     user_id = request.session.get('user_id')
@@ -1001,24 +1050,31 @@ def quality_index_view(request):
     
     if request.method == 'GET' and 'topic' not in request.GET and 'qid' not in request.GET:
         topic_dist = Question.get_topic_distribution()
-        topic_acc = TestRecord.get_topic_accuracy()
-
-        accuracy_map = {item['topic']: item['accuracy'] for item in topic_acc}
+        topic_rating = Feedback.get_average_rating_by_topic()
+        rating_map = {item['topic']: item['avg_rating'] for item in topic_rating}
 
         for item in topic_dist:
             topic = item['topic']
-            item['accuracy'] = accuracy_map.get(topic, 0)
+            item['avg_rating'] = round(float(rating_map.get(topic, 0) or 0), 2)
 
         context = {
             'topic_distribution': topic_dist,
         }
-        return render(request, 'analysis/index.html', context)
+        return render(request, 'quality/index.html', context)
     if 'topic' in request.GET:
         topic = request.GET.get('topic')
         if topic == 'all':
             questions = Question.get_all()
         else:
             questions = Question.get_by_topic(topic)
+        
+        for q in questions:
+            q.avg_rating = Feedback.get_average_rating_for_question_id(q.id)
+            q.feedbacks = Feedback.get_feedbacks_for_question(q)
+            stats = TestRecord.get_question_stats(q.id)
+            q.pass_rate = stats['pass_rate']
+            print(f"Q{q.id} stats: {stats['total']}")
+        
         topics = ['all', 'vocab', 'grammar', 'cloze', 'reading']
         
         paginator = Paginator(questions, 10)  # 每頁 10 題
@@ -1031,24 +1087,33 @@ def quality_index_view(request):
             'current_topic': topic
         }
 
-        return render(request, 'analysis/topic_question_list.html', context)
+        return render(request, 'quality/topic_question_list.html', context)
 
-    # --- Case C: 題目選項統計圖 (AJAX) ---
-    if 'qid' in request.GET:
-        qid = request.GET.get('qid')
-        question = Question.get_by_id(qid)
-        stats = TestRecord.get_question_stats(qid)
 
-        response_data = {
-            'stats': stats['stats'],
-            'ratio': stats['ratio'],
-            'pass_rate': stats['pass_rate'],
-            'total': stats['total'],
-            'answer': question.answer if question else None
-        }
+# A5 題目品質查詢與回覆 發送建議
+@require_POST
+def quality_submit_improve_suggestion(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'success': False, 'message': '尚未登入'}, status=403)
 
-        return JsonResponse(response_data)
+    question_id = request.POST.get('question_id')
+    suggestion_text = request.POST.get('suggestion', '').strip()
 
+    if not question_id or not suggestion_text:
+        return JsonResponse({'success': False, 'message': '缺少欄位'}, status=400)
+
+    try:
+        ImproveSuggestion.add_suggestion(
+            question_id=question_id,
+            user_id=user_id,
+            suggestion=suggestion_text
+        )
+        return JsonResponse({'success': True, 'message': '建議已儲存'})
+    except ImproveSuggestion.DoesNotExist:
+        return JsonResponse({'success': False, 'message': '找不到題目'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
 class WrongChallengeSession:
     def __init__(self, user):

@@ -41,6 +41,7 @@
             cursor: pointer;
           }
     </style>
+    {{ topic_distribution|json_script:"topic-data" }}
 </head>
 <body>
     <div class="container">
@@ -54,7 +55,7 @@
           </div>
         {% endif %}
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>題目品質查詢與回覆（A5）<</h2>
+            <h2>題目品質查詢與回覆（A5）</h2>
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">返回主頁</a>
         </div>
         <hr>
@@ -73,104 +74,15 @@
     <script>
         const expandedQuestions = new Set();
         function loadQuestionList(topic) {
-        fetch(`/analysis/index/?topic=${encodeURIComponent(topic)}`)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('question-list-container').innerHTML = html;
-            });
-        }
-
-        function expandOptionChart(qid) {
-            const targetDiv = document.getElementById(`option-stats-${qid}`);
-            if (!targetDiv) return;
-          
-            fetch(`/analysis/index/?qid=${qid}`)
-              .then(response => response.json())
-              .then(data => {
-                const stats = data.stats;      // 次數
-                const ratio = data.ratio;      // 百分比
-                const answer = data.answer;
-                const passRate = data.pass_rate;
-          
-                const labels = ['A', 'B', 'C', 'D'];
-                const percentages = labels.map(label => ratio[label] || 0);
-                const counts = labels.map(label => stats[label] || 0);
-                const backgroundColors = labels.map(label =>
-                  label === answer ? '#ff6384' : '#36a2eb'
-                );
-          
-                targetDiv.innerHTML = `<canvas id="bar-${qid}" width="400"></canvas>`;
-                const ctx = document.getElementById(`bar-${qid}`);
-          
-                new Chart(ctx, {
-                  type: 'bar',
-                  data: {
-                    labels: labels,
-                    datasets: [{
-                      label: '選項被選機率 (%)',
-                      data: percentages,
-                      backgroundColor: backgroundColors,
-                      barThickness: 20,
-                      maxBarThickness: 24,
-                      minBarLength: 2
-                    }]
-                  },
-                  options: {
-                    indexAxis: 'y',
-                    scales: {
-                      x: {
-                        min: 0,
-                        max: 100,
-                        ticks: {
-                          callback: value => `${value}%`
-                        },
-                        title: {
-                          display: true,
-                          text: '被選機率 (%)'
-                        }
-                      }
-                    },
-                    plugins: {
-                      legend: { display: false },
-                      tooltip: {
-                        callbacks: {
-                          label: function(context) {
-                            const index = context.dataIndex;
-                            const label = context.label;
-                            const count = counts[index];
-                            const percentage = percentages[index];
-                            return `選項 ${label}：${count} 次（${percentage} %）`;
-                          }
-                        }
-                      }
-                    },
-                    layout: { padding: { top: 5, bottom: 5 } }
-                  }
-                });
-                const passRateSpan = document.getElementById(`pass-rate-${qid}`);
-                if (passRateSpan) {
-                    passRateSpan.innerText = `${passRate} %`;
-                }
-                targetDiv.style.display = "block";
+          fetch(`/quality/index/?topic=${encodeURIComponent(topic)}`)
+              .then(response => response.text())
+              .then(html => {
+                  document.getElementById('question-list-container').innerHTML = html;
               });
           }
-    
-        
-          function toggleOptions(qid) {
-            const targetDiv = document.getElementById(`option-stats-${qid}`);
-            if (!targetDiv) return;
-
-            if (targetDiv.style.display === "none" || targetDiv.style.display === "") {
-                expandedQuestions.add(qid);
-                expandOptionChart(qid);
-            } else {
-                expandedQuestions.delete(qid);
-                targetDiv.style.display = "none";
-            }
-        }
 
         function loadPage(topic, page) {
-            fetch(`/analysis/index/?topic=${encodeURIComponent(topic)}&page=${page}`)
+            fetch(`/quality/index/?topic=${encodeURIComponent(topic)}&page=${page}`)
               .then(response => response.text())
               .then(html => {
                 const container = document.getElementById('question-list-container');
@@ -195,7 +107,7 @@
         
 
 
-      const topicData = {{ topic_distribution|safe }};
+      const topicData = JSON.parse(document.getElementById('topic-data').textContent);
       const topicNameMap = {
         'vocab': '字彙',
         'grammar': '文法',
@@ -205,7 +117,6 @@
       };
       const pieLabels = topicData.map(item => topicNameMap[item.topic] || item.topic);
       const pieCounts = topicData.map(item => item.count);
-      const pieAccuracy = topicData.map(item => item.accuracy);
   
       const data = {
           labels: pieLabels,
@@ -228,10 +139,10 @@
                   datalabels: {
                     listeners: false,
                     formatter: function(value, context) {
-                        const index = context.dataIndex;
-                        const topic = pieLabels[index];
-                        const acc = pieAccuracy[index];
-                        return `${topic}\n正確率: ${acc}%`;
+                      const index = context.dataIndex;
+                      const topic = pieLabels[index];
+                      const rating = topicData[index].avg_rating || 0;
+                      return `${topic}\n平均難易度: ${rating}`;
                     },
                     color: '#fff',
                     font: {
@@ -273,6 +184,51 @@
   
       new Chart(document.getElementById('topicPieChart'), config);
 
+      function submitSuggestion(qid) {
+        const textarea = document.getElementById(`suggestion-text-${qid}`);
+        const suggestion = textarea.value.trim();
+      
+        if (!suggestion) {
+          alert('請輸入建議內容');
+          return;
+        }
+      
+        fetch('/quality/submit-suggestion/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: `question_id=${encodeURIComponent(qid)}&suggestion=${encodeURIComponent(suggestion)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById(`suggestion-result-${qid}`).style.display = 'block';
+          } else {
+            alert('送出失敗：' + data.message);
+          }
+        })
+        .catch(err => {
+          console.error('送出建議失敗', err);
+          alert('發送時發生錯誤，請稍後再試。');
+        });
+      }
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (const cookie of cookies) {
+            const trimmed = cookie.trim();
+            if (trimmed.startsWith(name + '=')) {
+              cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
       
   </script>
 </body>
