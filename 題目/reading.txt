@@ -1,0 +1,244 @@
+20 題閱讀理解選擇題
+
+[
+  {
+    "content": "Jenny is a college student. She wakes up early every day and goes for a run before breakfast. After that, she attends her classes and studies in the library in the afternoon. What does Jenny do before breakfast?",
+    "options": {
+      "A": "She eats a big meal",
+      "B": "She goes running",
+      "C": "She studies in the library",
+      "D": "She attends class"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Tom loves animals. He volunteers at the animal shelter on weekends. He helps feed the dogs and clean their cages. Where does Tom volunteer?",
+    "options": {
+      "A": "At a hospital",
+      "B": "At a school",
+      "C": "At an animal shelter",
+      "D": "At a park"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Maria enjoys cooking. She often watches cooking shows and tries new recipes. Her favorite dish to cook is spaghetti. What does Maria like to cook the most?",
+    "options": {
+      "A": "Pizza",
+      "B": "Spaghetti",
+      "C": "Salad",
+      "D": "Soup"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The library is open from 9 a.m. to 8 p.m. on weekdays. It is closed on Sundays. On Saturdays, it opens from 10 a.m. to 4 p.m. When is the library closed?",
+    "options": {
+      "A": "On Monday",
+      "B": "On Saturday",
+      "C": "On Sunday",
+      "D": "On Friday"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Leo planted some flowers in his garden last spring. Now they have grown tall and are full of colorful blossoms. What happened to the flowers Leo planted?",
+    "options": {
+      "A": "They died",
+      "B": "They grew tall and blossomed",
+      "C": "They were picked",
+      "D": "They did not grow"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Amy goes to the gym every morning. She exercises for one hour before heading to work. What does Amy do every morning?",
+    "options": {
+      "A": "She eats breakfast",
+      "B": "She goes shopping",
+      "C": "She goes to the gym",
+      "D": "She watches TV"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "It rained all day yesterday, so the soccer game was canceled. What happened to the soccer game?",
+    "options": {
+      "A": "It was played late",
+      "B": "It was moved indoors",
+      "C": "It was canceled",
+      "D": "It was rescheduled for the morning"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Anna is reading a mystery novel. She enjoys stories with exciting plots and surprising endings. What kind of stories does Anna enjoy?",
+    "options": {
+      "A": "Science books",
+      "B": "Mystery novels",
+      "C": "History books",
+      "D": "Poetry"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Ben works at a bakery. Every morning, he makes bread and cakes for customers. What does Ben do for work?",
+    "options": {
+      "A": "He delivers packages",
+      "B": "He cooks at a restaurant",
+      "C": "He bakes bread and cakes",
+      "D": "He sells vegetables"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The zoo has many animals, including lions, elephants, and monkeys. Children love visiting the zoo on weekends. What do children enjoy doing on weekends?",
+    "options": {
+      "A": "Visiting the zoo",
+      "B": "Playing video games",
+      "C": "Staying home",
+      "D": "Going to school"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Nancy went to the supermarket to buy vegetables, fruits, and some snacks. Where did Nancy go?",
+    "options": {
+      "A": "To the park",
+      "B": "To the bakery",
+      "C": "To the supermarket",
+      "D": "To the bookstore"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Peter always wears a helmet when he rides his bicycle. He believes safety is important. What does Peter wear for safety?",
+    "options": {
+      "A": "Gloves",
+      "B": "A hat",
+      "C": "A helmet",
+      "D": "Sunglasses"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "It snowed heavily last night, so the school is closed today. Why is the school closed?",
+    "options": {
+      "A": "It’s summer vacation",
+      "B": "There was heavy snow",
+      "C": "There was a fire drill",
+      "D": "It’s a national holiday"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Sally waters her plants every evening. She enjoys watching them grow. What does Sally do in the evening?",
+    "options": {
+      "A": "She eats dinner",
+      "B": "She reads a book",
+      "C": "She waters her plants",
+      "D": "She feeds her dog"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Kevin was feeling sick, so he went to see a doctor. Why did Kevin go to the doctor?",
+    "options": {
+      "A": "To get medicine",
+      "B": "To play a game",
+      "C": "To go to work",
+      "D": "To meet a friend"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The movie started at 7:00 p.m., but Lisa arrived at 7:30 p.m. When did Lisa arrive at the movie?",
+    "options": {
+      "A": "On time",
+      "B": "Early",
+      "C": "Late",
+      "D": "At 6:30"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "David always turns off the lights when he leaves a room. He wants to save electricity. Why does David turn off the lights?",
+    "options": {
+      "A": "To save electricity",
+      "B": "To sleep better",
+      "C": "To keep the room cool",
+      "D": "To clean the room"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Helen went to the beach and forgot to wear sunscreen. Now her skin is red and painful. What happened to Helen?",
+    "options": {
+      "A": "She got a sunburn",
+      "B": "She got a tan",
+      "C": "She got cold",
+      "D": "She fell"
+    },
+    "answer": "A",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The bakery near our house sells fresh bread every morning. Many people line up early to buy it. Why do people go to the bakery early?",
+    "options": {
+      "A": "To avoid the heat",
+      "B": "To get fresh bread",
+      "C": "To see friends",
+      "D": "To get coffee"
+    },
+    "answer": "B",
+    "topic": "reading",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Oliver lost his keys and couldn’t get into his house. He had to wait for his sister to bring the spare key. Why did Oliver have to wait?",
+    "options": {
+      "A": "He forgot his phone",
+      "B": "He didn’t have money",
+      "C": "He lost his keys",
+      "D": "He missed the bus"
+    },
+    "answer": "C",
+    "topic": "reading",
+    "is_gpt_generated": false
+  }
+]

@@ -1,0 +1,244 @@
+20 題文法選擇題
+
+[
+  {
+    "content": "People got very excited when they watched Ms. Smith ______ at the party.",
+    "options": {
+      "A": "danced",
+      "B": "dancing",
+      "C": "has danced",
+      "D": "to dance"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "I tried on these shoes in several different _____, and I thought the white pair looked best on me.",
+    "options": {
+      "A": "colors",
+      "B": "prices",
+      "C": "shapes",
+      "D": "sizes"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Rex did not feel the earthquake this morning. He _____ in the park at the time.",
+    "options": {
+      "A": "jogged",
+      "B": "was jogging",
+      "C": "has jogged",
+      "D": "would jog"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The teacher asked the students _____ their homework before class.",
+    "options": {
+      "A": "finishing",
+      "B": "to finish",
+      "C": "finished",
+      "D": "finish"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Neither Tom nor his friends _____ coming to the party.",
+    "options": {
+      "A": "is",
+      "B": "was",
+      "C": "are",
+      "D": "be"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "If I _____ more time, I would travel around the world.",
+    "options": {
+      "A": "have",
+      "B": "had",
+      "C": "will have",
+      "D": "has"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "She _____ to music when I entered the room.",
+    "options": {
+      "A": "listens",
+      "B": "was listening",
+      "C": "listened",
+      "D": "is listening"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "By the time we arrived, the movie _____.",
+    "options": {
+      "A": "had started",
+      "B": "starts",
+      "C": "is starting",
+      "D": "has started"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Susan is the girl _____ won the speech contest.",
+    "options": {
+      "A": "which",
+      "B": "what",
+      "C": "who",
+      "D": "where"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Let me know as soon as he _____.",
+    "options": {
+      "A": "arrives",
+      "B": "arrived",
+      "C": "will arrive",
+      "D": "has been arriving"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He has lived in Japan _____ five years.",
+    "options": {
+      "A": "since",
+      "B": "during",
+      "C": "for",
+      "D": "by"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Not only she but also her parents _____ interested in the program.",
+    "options": {
+      "A": "is",
+      "B": "are",
+      "C": "was",
+      "D": "has"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "You should have told me if you _____ help.",
+    "options": {
+      "A": "need",
+      "B": "needed",
+      "C": "have needed",
+      "D": "had needed"
+    },
+    "answer": "D",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The book was so interesting that I couldn't _____ it down.",
+    "options": {
+      "A": "set",
+      "B": "let",
+      "C": "put",
+      "D": "make"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "This is the best movie I _____ seen.",
+    "options": {
+      "A": "never",
+      "B": "have ever",
+      "C": "had ever",
+      "D": "did ever"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He asked me where I _____ from.",
+    "options": {
+      "A": "come",
+      "B": "came",
+      "C": "comes",
+      "D": "was come"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Mary speaks English better than _____ in her class.",
+    "options": {
+      "A": "anyone",
+      "B": "someone",
+      "C": "everyone",
+      "D": "no one"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "I don’t know whether he _____ come or not.",
+    "options": {
+      "A": "will",
+      "B": "would",
+      "C": "shall",
+      "D": "should"
+    },
+    "answer": "A",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The coffee smells _____.",
+    "options": {
+      "A": "well",
+      "B": "good",
+      "C": "better",
+      "D": "best"
+    },
+    "answer": "B",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Each of the students _____ a dictionary.",
+    "options": {
+      "A": "need",
+      "B": "have",
+      "C": "needs",
+      "D": "are"
+    },
+    "answer": "C",
+    "topic": "grammar",
+    "is_gpt_generated": false
+  }
+]

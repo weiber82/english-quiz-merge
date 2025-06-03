@@ -1,0 +1,364 @@
+20 題單字題 + 10 題語境填空題
+
+[
+  {
+    "content": "Choose the word closest in meaning to: 'Rapid'",
+    "options": {
+      "A": "Slow",
+      "B": "Quick",
+      "C": "Heavy",
+      "D": "Late"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Assist'",
+    "options": {
+      "A": "Help",
+      "B": "Ignore",
+      "C": "Forget",
+      "D": "Blame"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Tiny'",
+    "options": {
+      "A": "Large",
+      "B": "Thick",
+      "C": "Small",
+      "D": "Fast"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Silent'",
+    "options": {
+      "A": "Noisy",
+      "B": "Quiet",
+      "C": "Busy",
+      "D": "Warm"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Purchase'",
+    "options": {
+      "A": "Sell",
+      "B": "Fix",
+      "C": "Buy",
+      "D": "Create"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Bright'",
+    "options": {
+      "A": "Smart",
+      "B": "Shiny",
+      "C": "Dark",
+      "D": "Empty"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Journey'",
+    "options": {
+      "A": "Work",
+      "B": "Trip",
+      "C": "Game",
+      "D": "Race"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Delicious'",
+    "options": {
+      "A": "Tasty",
+      "B": "Ugly",
+      "C": "Burned",
+      "D": "Raw"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Quickly'",
+    "options": {
+      "A": "Slowly",
+      "B": "Rarely",
+      "C": "Fast",
+      "D": "Clearly"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Dangerous'",
+    "options": {
+      "A": "Safe",
+      "B": "Risky",
+      "C": "Easy",
+      "D": "Boring"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Begin'",
+    "options": {
+      "A": "End",
+      "B": "Close",
+      "C": "Start",
+      "D": "Break"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Huge'",
+    "options": {
+      "A": "Big",
+      "B": "Tiny",
+      "C": "Light",
+      "D": "Soft"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Angry'",
+    "options": {
+      "A": "Sad",
+      "B": "Happy",
+      "C": "Mad",
+      "D": "Calm"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Beautiful'",
+    "options": {
+      "A": "Pretty",
+      "B": "Ugly",
+      "C": "Dirty",
+      "D": "Funny"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Laugh'",
+    "options": {
+      "A": "Cry",
+      "B": "Smile",
+      "C": "Yell",
+      "D": "Giggle"
+    },
+    "answer": "D",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Clean'",
+    "options": {
+      "A": "Messy",
+      "B": "Neat",
+      "C": "Wet",
+      "D": "Old"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Friend'",
+    "options": {
+      "A": "Enemy",
+      "B": "Buddy",
+      "C": "Teacher",
+      "D": "Boss"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Speak'",
+    "options": {
+      "A": "Talk",
+      "B": "Listen",
+      "C": "Shout",
+      "D": "Write"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Cold'",
+    "options": {
+      "A": "Warm",
+      "B": "Hot",
+      "C": "Cool",
+      "D": "Dry"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Choose the word closest in meaning to: 'Jump'",
+    "options": {
+      "A": "Sit",
+      "B": "Leap",
+      "C": "Walk",
+      "D": "Crawl"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "We won’t see the sun even after the typhoon leaves, because the news said that heavier rain will soon _____.",
+    "options": {
+      "A": "catch",
+      "B": "follow",
+      "C": "move",
+      "D": "stop"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Please speak more clearly. I can’t _____ what you’re saying.",
+    "options": {
+      "A": "hear",
+      "B": "see",
+      "C": "touch",
+      "D": "guess"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "My dad always _____ a cup of coffee before going to work.",
+    "options": {
+      "A": "makes",
+      "B": "does",
+      "C": "plays",
+      "D": "draws"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "After a long day at school, Jerry felt very _____.",
+    "options": {
+      "A": "hungry",
+      "B": "tired",
+      "C": "excited",
+      "D": "lucky"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Be careful with that glass! If you drop it, it will _____.",
+    "options": {
+      "A": "shine",
+      "B": "float",
+      "C": "break",
+      "D": "run"
+    },
+    "answer": "C",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Lily was _____ when she saw the beautiful sunset by the beach.",
+    "options": {
+      "A": "bored",
+      "B": "amazed",
+      "C": "sleepy",
+      "D": "noisy"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The museum is closed on Mondays, so we have to go there on _____.",
+    "options": {
+      "A": "Tuesday",
+      "B": "Sunday",
+      "C": "Friday",
+      "D": "Monday"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "To stay healthy, people should eat more fruits and _____.",
+    "options": {
+      "A": "vegetables",
+      "B": "candies",
+      "C": "pizzas",
+      "D": "drinks"
+    },
+    "answer": "A",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Tom didn’t bring an umbrella, so he got completely _____ in the rain.",
+    "options": {
+      "A": "hot",
+      "B": "wet",
+      "C": "dry",
+      "D": "clean"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The baby was crying, but she _____ as soon as her mother held her.",
+    "options": {
+      "A": "laughed",
+      "B": "stopped",
+      "C": "ran",
+      "D": "ate"
+    },
+    "answer": "B",
+    "topic": "vocab",
+    "is_gpt_generated": false
+  }
+]

@@ -1,0 +1,245 @@
+20 題克漏字選擇題
+包括片語搭配、介系詞
+
+[
+  {
+    "content": "She is looking forward _____ her vacation next week.",
+    "options": {
+      "A": "to",
+      "B": "for",
+      "C": "on",
+      "D": "at"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The kids made fun _____ the new student.",
+    "options": {
+      "A": "with",
+      "B": "for",
+      "C": "of",
+      "D": "to"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He succeeded _____ passing the driving test on his first try.",
+    "options": {
+      "A": "on",
+      "B": "in",
+      "C": "at",
+      "D": "with"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Jenny insisted _____ paying for the meal.",
+    "options": {
+      "A": "on",
+      "B": "in",
+      "C": "at",
+      "D": "to"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He is responsible _____ cleaning the office every Friday.",
+    "options": {
+      "A": "to",
+      "B": "with",
+      "C": "for",
+      "D": "by"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "The teacher was angry _____ the students for being noisy.",
+    "options": {
+      "A": "on",
+      "B": "at",
+      "C": "about",
+      "D": "with"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "My parents are proud _____ my accomplishments.",
+    "options": {
+      "A": "of",
+      "B": "about",
+      "C": "with",
+      "D": "for"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "She apologized _____ being late to the meeting.",
+    "options": {
+      "A": "of",
+      "B": "for",
+      "C": "to",
+      "D": "with"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "They congratulated her _____ winning the prize.",
+    "options": {
+      "A": "about",
+      "B": "in",
+      "C": "on",
+      "D": "for"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "I’m interested _____ learning how to play the guitar.",
+    "options": {
+      "A": "in",
+      "B": "at",
+      "C": "with",
+      "D": "for"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He’s afraid _____ speaking in public.",
+    "options": {
+      "A": "to",
+      "B": "for",
+      "C": "with",
+      "D": "of"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "This book is full _____ useful information.",
+    "options": {
+      "A": "of",
+      "B": "with",
+      "C": "by",
+      "D": "on"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He ran _____ money before the end of the month.",
+    "options": {
+      "A": "away",
+      "B": "of",
+      "C": "over",
+      "D": "out of"
+    },
+    "answer": "D",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Please take care _____ my dog while I’m away.",
+    "options": {
+      "A": "for",
+      "B": "of",
+      "C": "with",
+      "D": "to"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "We need to deal _____ this issue immediately.",
+    "options": {
+      "A": "on",
+      "B": "at",
+      "C": "with",
+      "D": "to"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Tom got married _____ a woman he met in college.",
+    "options": {
+      "A": "with",
+      "B": "by",
+      "C": "to",
+      "D": "for"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "She is very good _____ math.",
+    "options": {
+      "A": "in",
+      "B": "on",
+      "C": "at",
+      "D": "to"
+    },
+    "answer": "C",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "We agreed _____ meet at 7 p.m. at the restaurant.",
+    "options": {
+      "A": "on",
+      "B": "to",
+      "C": "for",
+      "D": "with"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "He apologized to his friend _____ the misunderstanding.",
+    "options": {
+      "A": "for",
+      "B": "of",
+      "C": "about",
+      "D": "on"
+    },
+    "answer": "A",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  },
+  {
+    "content": "Many students are worried _____ their final exams.",
+    "options": {
+      "A": "with",
+      "B": "about",
+      "C": "at",
+      "D": "by"
+    },
+    "answer": "B",
+    "topic": "cloze",
+    "is_gpt_generated": false
+  }
+]
