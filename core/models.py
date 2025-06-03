@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Min
+from django.db.models import Min, Count, Q, F
 from django.utils import timezone
 from django.conf import settings
 from django.db.models import Avg
@@ -81,7 +81,7 @@ class Question(models.Model):
     
     #  依據主題與是否包含 GPT 題目取得題目清單
     @classmethod
-    def get_by_topic(cls, topic, include_gpt):
+    def get_by_topic(cls, topic, include_gpt=None):
         qs = cls.objects.filter(topic=topic)
         if include_gpt == 'no':
             qs = qs.filter(is_gpt_generated=False)
@@ -103,7 +103,7 @@ class Question(models.Model):
             topic=qdict['topic'],
             is_gpt_generated=include_gpt
         )
-    #
+
     # 依 ID 刪除題目
     @classmethod
     def delete_by_id(cls, qid):
@@ -113,7 +113,7 @@ class Question(models.Model):
             return True
         except cls.DoesNotExist:
             return False
-        
+
 
     @classmethod
     def create_from_gpt(cls, content, options, answer, topic):
@@ -127,7 +127,25 @@ class Question(models.Model):
             topic=topic,
             is_gpt_generated=True
         )
-        
+
+    
+    # 統計每個題型的題目數量
+    @classmethod
+    def get_topic_distribution(cls):
+        all_topics = ['vocab', 'grammar', 'cloze', 'reading']
+
+        data = (
+            cls.objects
+            .values('topic')
+            .annotate(count=Count('id'))
+        )
+        count_map = {}
+        for item in data:
+            topic = item.get('topic')
+            if topic:
+                count_map[topic] = item['count']
+
+        return [{'topic': topic, 'count': count_map.get(topic, 0)} for topic in all_topics]
     
 class TestRecord(models.Model):
     test_result_id = models.CharField(max_length=64) 
@@ -227,6 +245,59 @@ class TestRecord(models.Model):
             })
 
         return test_history_details
+    
+    # 計算各個題型的平均正確率
+    @classmethod
+    def get_topic_accuracy(cls):
+        data = (
+            cls.objects
+            .values(topic=F('question__topic'))
+            .annotate(
+                total=Count('id'),
+                correct=Count('id', filter=Q(is_correct=True))
+            )
+            .order_by('topic')
+        )
+        return [
+            {
+                'topic': item['topic'],
+                'accuracy': round(item['correct'] / item['total'] * 100, 2) if item['total'] else 0
+            }
+            for item in data
+        ]
+
+    # 根據 Question.id 取得所有作答記錄
+    @classmethod
+    def get_records_by_question_id(cls, qid):
+        return cls.objects.filter(question_id=qid)
+    
+    # 根據 Question.id 取得選項分析數據(被選次數、被選比率、通過率、該題測驗總數)
+    @classmethod
+    def get_question_stats(cls, question_id):
+        records = cls.objects.filter(question_id=question_id)
+        total_records = records.count()
+        correct_count = records.filter(is_correct=True).count()
+
+        # 各選項被選次數
+        option_stats = {opt: 0 for opt in ['A', 'B', 'C', 'D']}
+        for r in records:
+            if r.selected_option in option_stats:
+                option_stats[r.selected_option] += 1
+
+        # 各選項被選機率 (%)
+        option_ratio = {}
+        for opt, count in option_stats.items():
+            option_ratio[opt] = round((count / total_records) * 100, 1) if total_records > 0 else 0.0
+
+        # 通過率 (%)
+        pass_rate = round((correct_count / total_records) * 100, 1) if total_records > 0 else 0.0
+
+        return {
+            'stats': option_stats,
+            'ratio': option_ratio,
+            'pass_rate': pass_rate,
+            'total': total_records
+        }
     
 
 class WeakTopic(models.Model):
@@ -436,6 +507,25 @@ class Feedback(models.Model):
         if topic_name and topic_name.lower() != 'all': 
             feedbacks_query = feedbacks_query.filter(question__topic=topic_name)
         return feedbacks_query.select_related('question').order_by('-created_at') # 優化查詢
+    
+    # ⭐ 新增：取得主題題型平均難易度 ⭐
+    @classmethod
+    def get_average_rating_by_topic(cls):
+        all_topics = ['vocab', 'grammar', 'cloze', 'reading']
+
+        data = (
+            cls.objects
+            .values('question__topic')
+            .annotate(avg_rating=Avg('rating'))
+        )
+
+        # 這裡的 key 是 question__topic，但實際上 Django 回傳的 key 是 'topic'
+        rating_map = {item['question__topic']: item['avg_rating'] for item in data}
+
+        return [
+            {'topic': topic, 'avg_rating': round(float(rating_map.get(topic, 0) or 0), 2)}
+            for topic in all_topics
+        ]
 
 
 
@@ -626,9 +716,10 @@ class WrongQuestion(models.Model):
                           
 
 class ImproveSuggestion(models.Model):
-    question = models.OneToOneField(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='improve_suggestions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     need_improve = models.BooleanField(default=False)
-    suggestion = models.JSONField(default=dict, blank=True)
+    suggestion = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -642,11 +733,8 @@ class ImproveSuggestion(models.Model):
         """
         根據題目 ID 判斷是否標記為需要改善。
         """
-        try:
-            suggestion_obj = cls.objects.get(question_id=question_id)
-            return suggestion_obj.need_improve
-        except cls.DoesNotExist:
-            return False
+        suggestion_obj = cls.objects.filter(question_id=question_id, need_improve=True).first()
+        return suggestion_obj is not None
 
     @classmethod
     def get_suggestion_by_id(cls, question_id):
@@ -658,3 +746,33 @@ class ImproveSuggestion(models.Model):
             return suggestion_obj.suggestion if suggestion_obj.need_improve else None
         except cls.DoesNotExist:
             return None
+
+    @classmethod
+    def add_suggestion(cls, question_id, user_id, suggestion):
+        if not suggestion.strip():
+            raise ValueError("suggestion 不可為空")
+
+        question = Question.objects.get(id=question_id)
+        user = User.objects.get(id=user_id)
+
+        suggestion_obj = cls.objects.create(
+            question=question,
+            user=user,
+            suggestion=suggestion.strip(),
+            need_improve=True
+        )
+        return suggestion_obj
+    
+    @classmethod
+    def list_by_question(cls, question_id):
+        return cls.objects.filter(question_id=question_id).order_by('-created_at')
+    
+    @classmethod
+    def mark_resolved_by_id(cls, suggestion_id):
+        try:
+            obj = cls.objects.get(id=suggestion_id)
+            obj.need_improve = False
+            obj.save()
+            return True
+        except cls.DoesNotExist:
+            return False
